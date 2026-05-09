@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ContentIQ - Upload Content</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #0a0a0f; color: #f5f2eb; font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; display: flex; flex-direction: column; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 0 50px; height: 58px; border-bottom: 1px solid rgba(201,168,76,0.2); background-color: rgba(10,10,15,0.95); position: sticky; top: 0; z-index: 100; }
+    .logo { font-family: 'Playfair Display', serif; font-size: 18px; color: #c9a84c; letter-spacing: 2px; text-transform: uppercase; }
+    .nav-links { display: flex; align-items: center; gap: 5px; }
+    .nav-a { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #6b6860; text-decoration: none; padding: 6px 12px; transition: color 0.2s; }
+    .nav-a:hover { color: #f5f2eb; }
+    .nav-logout { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 6px 14px; border: 1px solid rgba(201,168,76,0.2); color: #6b6860; text-decoration: none; transition: all 0.2s; margin-left: 12px; background: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+    .nav-logout:hover { border-color: #c9a84c; color: #c9a84c; }
+
+    /* STEP PROGRESS BAR */
+    .steps-bar { display: flex; border-bottom: 1px solid rgba(201,168,76,0.2); }
+    .step { flex: 1; padding: 16px 30px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #6b6860; border-right: 1px solid rgba(201,168,76,0.2); display: flex; align-items: center; gap: 10px; }
+    .step:last-child { border-right: none; }
+    .step.active { color: #c9a84c; }
+    .step.done { color: #7ec87e; }
+    .step-num { width: 22px; height: 22px; border: 1px solid currentColor; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; }
+
+    /* PAGE HEADER */
+    .page-header { padding: 35px 50px; border-bottom: 1px solid rgba(201,168,76,0.2); }
+    .header-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #c9a84c; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .header-label::before { content: ""; width: 20px; height: 1px; background-color: #c9a84c; }
+    .page-header h1 { font-family: 'Playfair Display', serif; font-size: 30px; }
+    .page-header p { font-size: 14px; color: #6b6860; margin-top: 5px; }
+
+    /* MAIN */
+    .main { padding: 40px 50px; flex: 1; }
+
+    /* TWO UPLOAD BOXES SIDE BY SIDE */
+    .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background-color: rgba(201,168,76,0.2); border: 1px solid rgba(201,168,76,0.2); margin-bottom: 20px; }
+
+    /* Clickable file upload area */
+    .upload-zone { background-color: #0a0a0f; padding: 50px 30px; text-align: center; cursor: pointer; transition: background-color 0.2s; position: relative; }
+    .upload-zone:hover, .upload-zone.dragging { background-color: rgba(201,168,76,0.05); }
+    .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .zone-icon { font-size: 32px; margin-bottom: 18px; display: block; }
+    .zone-title { font-size: 15px; font-weight: 500; margin-bottom: 8px; }
+    .zone-sub { font-size: 13px; color: #6b6860; line-height: 1.6; }
+    .zone-hint { font-size: 11px; color: rgba(107,104,96,0.6); margin-top: 10px; letter-spacing: 1px; }
+
+    /* Text paste area */
+    .paste-zone { background-color: #0a0a0f; padding: 30px; display: flex; flex-direction: column; }
+    .paste-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #6b6860; margin-bottom: 12px; }
+    textarea { flex: 1; min-height: 220px; padding: 15px; font-size: 14px; background-color: rgba(255,255,255,0.03); border: 1px solid rgba(201,168,76,0.2); color: #f5f2eb; font-family: 'DM Sans', sans-serif; font-weight: 300; outline: none; resize: none; line-height: 1.7; transition: border-color 0.2s; }
+    textarea:focus { border-color: #c9a84c; }
+    textarea::placeholder { color: rgba(107,104,96,0.5); }
+
+    /* PREVIEW BOX */
+    .preview-box { border: 1px solid rgba(201,168,76,0.2); padding: 18px 22px; margin-bottom: 25px; background-color: rgba(255,255,255,0.02); }
+    .preview-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #c9a84c; margin-bottom: 8px; }
+    .preview-text { font-size: 13px; color: #6b6860; line-height: 1.7; }
+
+    /* BOTTOM BUTTONS */
+    .form-actions { display: flex; justify-content: space-between; align-items: center; }
+    .btn-gold { display: inline-block; padding: 11px 25px; background-color: #c9a84c; color: #0a0a0f; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; text-decoration: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background-color 0.2s; }
+    .btn-gold:hover { background-color: #e8c97a; }
+    .btn-ghost { display: inline-block; padding: 11px 25px; border: 1px solid rgba(201,168,76,0.2); color: #6b6860; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; transition: all 0.2s; font-family: 'DM Sans', sans-serif; background: none; cursor: pointer; }
+    .btn-ghost:hover { border-color: #6b6860; color: #f5f2eb; }
+
+    footer { border-top: 1px solid rgba(201,168,76,0.2); padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; }
+    .footer-logo { font-family: 'Playfair Display', serif; font-size: 13px; color: #c9a84c; letter-spacing: 2px; text-transform: uppercase; }
+    .footer-copy { font-size: 11px; color: #6b6860; }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .page-header { padding: 25px 20px; }
+      .main { padding: 25px 20px; }
+      .upload-grid { grid-template-columns: 1fr; }
+      .steps-bar { display: none; }
+      footer { padding: 15px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">ContentIQ</div>
+    <div class="nav-links">
+      <a href="/dashboard" class="nav-a">Dashboard</a>
+      <a href="/reporthistory" class="nav-a">History</a>
+      <a href="/profile" class="nav-a">Profile</a>
+      <button type="button" class="nav-logout" id="logoutBtn">Log out</button>
+    </div>
+  </nav>
+
+  <!-- STEP PROGRESS BAR -->
+  <div class="steps-bar">
+    <div class="step active"><div class="step-num">1</div>Upload content</div>
+    <div class="step"><div class="step-num">2</div>Select services</div>
+    <div class="step"><div class="step-num">3</div>View results</div>
+  </div>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="header-label">Step 1 of 3</div>
+    <h1>Upload your content</h1>
+    <p>Upload a file or paste your text to begin analysis</p>
+  </div>
+
+  <div class="main">
+
+    <!-- UPLOAD + PASTE SIDE BY SIDE -->
+    <div class="upload-grid">
+
+      <!-- File upload box -->
+      <label class="upload-zone" id="dropZone">
+        <input type="file" accept=".pdf,.docx,.txt" id="fileInput" onchange="handleFile(this)">
+        <span class="zone-icon">📤</span>
+        <div class="zone-title">Upload a file</div>
+        <div class="zone-sub">Click to browse, or drag and drop</div>
+        <div class="zone-hint" id="fileInfo">PDF · DOCX · TXT — max 10 MB</div>
+      </label>
+
+      <!-- Text paste box -->
+      <div class="paste-zone">
+        <div class="paste-label">Or paste text directly</div>
+        <textarea id="pasteBox" placeholder="Paste your article, essay, or any text here..." oninput="handlePaste(this)"></textarea>
+      </div>
+
+    </div>
+
+    <!-- PREVIEW BOX -->
+    <div class="preview-box">
+      <div class="preview-label">Preview</div>
+      <div class="preview-text" id="previewText">Your content will appear here once you upload a file or paste text above.</div>
+    </div>
+
+    <!-- BOTTOM BUTTONS -->
+    <div class="form-actions">
+      <a href="/dashboard" class="btn-ghost">← Cancel</a>
+      <button type="button" class="btn-gold" id="continueBtn">Continue to services →</button>
+    </div>
+
+  </div>
+
+  <footer>
+    <div class="footer-logo">ContentIQ</div>
+    <div class="footer-copy">2026 ContentIQ</div>
+  </footer>
+
+  <script>
+    // Protect page
+    const loggedInUser = JSON.parse(localStorage.getItem("contentIQUser"));
+
+    if (!loggedInUser) {
+      alert("Please login first.");
+      localStorage.removeItem("contentIQToken"); localStorage.removeItem("contentIQUser"); window.location.href = "/login";
+    }
+
+    let uploadedFileData = null;
+
+    // When user picks a file, show its name in the zone hint and update preview
+    function handleFile(input) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const sizeKB = Math.round(file.size / 1024);
+
+        uploadedFileData = {
+          name: file.name,
+          sizeKB: sizeKB,
+          type: file.type || "unknown"
+        };
+
+        document.getElementById("fileInfo").textContent = "Selected: " + file.name + " (" + sizeKB + " KB)";
+        document.getElementById("previewText").textContent = 'File ready for analysis: "' + file.name + '". Click Continue to select services.';
+        document.getElementById("dropZone").style.backgroundColor = "rgba(201,168,76,0.06)";
+
+        // If a file is selected, clear pasted text so only one source is active
+        document.getElementById("pasteBox").value = "";
+      }
+    }
+
+    // When user types in the textarea, show a preview of their text
+    function handlePaste(textarea) {
+      const text = textarea.value.trim();
+      const preview = document.getElementById("previewText");
+
+      if (text.length > 0) {
+        preview.textContent = text.substring(0, 300) + (text.length > 300 ? "..." : "");
+        uploadedFileData = null;
+        document.getElementById("fileInput").value = "";
+        document.getElementById("fileInfo").textContent = "PDF · DOCX · TXT — max 10 MB";
+        document.getElementById("dropZone").style.backgroundColor = "";
+      } else {
+        preview.textContent = "Your content will appear here once you upload a file or paste text above.";
+      }
+    }
+
+    // Drag and drop highlight effect
+    const dropZone = document.getElementById("dropZone");
+
+    dropZone.addEventListener("dragover", function(e) {
+      e.preventDefault();
+      dropZone.classList.add("dragging");
+    });
+
+    dropZone.addEventListener("dragleave", function() {
+      dropZone.classList.remove("dragging");
+    });
+
+    dropZone.addEventListener("drop", function(e) {
+      e.preventDefault();
+      dropZone.classList.remove("dragging");
+
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        document.getElementById("fileInput").files = e.dataTransfer.files;
+        const sizeKB = Math.round(file.size / 1024);
+
+        uploadedFileData = {
+          name: file.name,
+          sizeKB: sizeKB,
+          type: file.type || "unknown"
+        };
+
+        document.getElementById("fileInfo").textContent = "Dropped: " + file.name + " (" + sizeKB + " KB)";
+        document.getElementById("previewText").textContent = 'File ready for analysis: "' + file.name + '". Click Continue to select services.';
+        document.getElementById("pasteBox").value = "";
+      }
+    });
+
+    // Continue button logic
+    document.getElementById("continueBtn").addEventListener("click", function () {
+      const pastedText = document.getElementById("pasteBox").value.trim();
+
+      if (!pastedText && !uploadedFileData) {
+        alert("Please upload a file or paste some text before continuing.");
+        return;
+      }
+
+      const uploadContentData = {
+        mode: pastedText ? "text" : "file",
+        text: pastedText || "",
+        file: uploadedFileData,
+        savedAt: new Date().toISOString()
+      };
+
+      localStorage.setItem("contentIQUploadData", JSON.stringify(uploadContentData));
+      window.location.href = "/selectservices";
+    });
+
+    // Logout button
+    document.getElementById("logoutBtn").addEventListener("click", function () {
+      localStorage.removeItem("contentIQUser");
+      localStorage.removeItem("contentIQUploadData");
+      alert("Logged out successfully.");
+      window.location.href = "/";
+    });
+  </script>
+
+</body>
+</html>

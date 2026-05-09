@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ContentIQ - Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+
+    /* ===== BASIC RESET ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* ===== PAGE DEFAULTS ===== */
+    body {
+      background-color: #0a0a0f;
+      color: #f5f2eb;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+    }
+
+    /* ===== TOP NAVIGATION ===== */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 50px;
+      border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+      background-color: rgba(10, 10, 15, 0.95);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    /* Logo text */
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      color: #c9a84c;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* Nav buttons on the right */
+    .nav-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    /* Outlined button */
+    .btn-outline {
+      padding: 8px 20px;
+      border: 1px solid rgba(201, 168, 76, 0.4);
+      background: transparent;
+      color: #6b6860;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-outline:hover {
+      border-color: #c9a84c;
+      color: #c9a84c;
+    }
+
+    /* Gold filled button */
+    .btn-gold {
+      padding: 8px 20px;
+      border: none;
+      background-color: #c9a84c;
+      color: #0a0a0f;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.2s;
+      display: inline-block;
+    }
+
+    .btn-gold:hover {
+      background-color: #e8c97a;
+    }
+
+    /* ===== HERO SECTION ===== */
+
+    /* Outer wrapper: two columns side by side */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 88vh;
+      border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+    }
+
+    /* LEFT column: the text content */
+    .hero-left {
+      padding: 90px 60px 90px 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-right: 1px solid rgba(201, 168, 76, 0.12);
+    }
+
+    /* Small label above the title */
+    .hero-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #c9a84c;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* The little gold line before the label */
+    .hero-label::before {
+      content: "";
+      width: 30px;
+      height: 1px;
+      background-color: #c9a84c;
+    }
+
+    /* Big heading */
+    .hero-left h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 68px;
+      line-height: 1;
+      margin-bottom: 25px;
+      letter-spacing: -1px;
+    }
+
+    /* Italic gold word inside heading */
+    .hero-left h1 em {
+      font-style: italic;
+      color: #c9a84c;
+    }
+
+    /* Paragraph under heading */
+    .hero-left p {
+      font-size: 16px;
+      color: #6b6860;
+      line-height: 1.8;
+      margin-bottom: 40px;
+      max-width: 400px;
+    }
+
+    /* Buttons row */
+    .hero-buttons {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+    }
+
+    /* Text-only link */
+    .link-text {
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #6b6860;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .link-text:hover {
+      color: #f5f2eb;
+    }
+
+    /* RIGHT column: the visual panel */
+    .hero-right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 50px 60px 60px;
+      position: relative;
+      overflow: hidden;
+      background-color: rgba(201, 168, 76, 0.015);
+    }
+
+    /* Faint large "IQ" text in the background for depth */
+    .hero-right::before {
+      content: "IQ";
+      position: absolute;
+      font-family: 'Playfair Display', serif;
+      font-size: 280px;
+      font-weight: 700;
+      color: rgba(201, 168, 76, 0.04);
+      bottom: -30px;
+      right: -10px;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* The floating mock dashboard card */
+    .hero-card {
+      width: 100%;
+      max-width: 420px;
+      border: 1px solid rgba(201, 168, 76, 0.25);
+      background-color: #0f0f16;
+      position: relative;
+      z-index: 1;
+      animation: float 5s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* Top bar of the card */
+    .card-topbar {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(201, 168, 76, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background-color: rgba(201, 168, 76, 0.2);
+    }
+    .dot:first-child { background-color: rgba(201, 168, 76, 0.5); }
+
+    .card-topbar-label {
+      margin-left: auto;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #c9a84c;
+    }
+
+    .card-body {
+      padding: 22px;
+    }
+
+    .card-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background-color: rgba(201, 168, 76, 0.15);
+      border: 1px solid rgba(201, 168, 76, 0.15);
+      margin-bottom: 18px;
+    }
+
+    .card-stat {
+      background-color: #0f0f16;
+      padding: 14px 10px;
+      text-align: center;
+    }
+
+    .card-stat-val {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #c9a84c;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .card-stat-lbl {
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #6b6860;
+    }
+
+    .card-section-title {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #c9a84c;
+      margin-bottom: 10px;
+    }
+
+    .card-result-row {
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(201, 168, 76, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-result-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .result-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: rgba(201, 168, 76, 0.08);
+      border: 1px solid rgba(201, 168, 76, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .result-info {
+      flex: 1;
+    }
+
+    .result-name {
+      font-size: 11px;
+      color: #f5f2eb;
+      margin-bottom: 6px;
+      font-weight: 400;
+    }
+
+    .result-bar-track {
+      height: 3px;
+      background-color: rgba(255, 255, 255, 0.06);
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .result-bar-fill {
+      height: 100%;
+      background-color: #c9a84c;
+    }
+
+    .result-bar-fill.green {
+      background-color: #7ec87e;
+    }
+
+    .result-score {
+      font-size: 13px;
+      font-weight: 500;
+      color: #c9a84c;
+      flex-shrink: 0;
+    }
+
+    .result-score.green {
+      color: #7ec87e;
+    }
+
+    .card-footer-row {
+      margin-top: 18px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(201, 168, 76, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-footer-label {
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #6b6860;
+    }
+
+    .card-status-badge {
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border: 1px solid rgba(126, 200, 126, 0.35);
+      color: #7ec87e;
+    }
+
+    /* ===== SCROLLING TICKER ===== */
+    .ticker {
+      border-top: 1px solid rgba(201, 168, 76, 0.2);
+      border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+      padding: 14px 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker-track {
+      display: inline-block;
+      animation: scroll-left 22s linear infinite;
+    }
+
+    .ticker-item {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #6b6860;
+      padding: 0 35px;
+    }
+
+    .ticker-item span {
+      color: #c9a84c;
+      margin-right: 8px;
+    }
+
+    @keyframes scroll-left {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* ===== FEATURES SECTION ===== */
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid rgba(201, 168, 76, 0.2);
+    }
+
+    .features-left {
+      padding: 70px 50px;
+      border-right: 1px solid rgba(201, 168, 76, 0.2);
+    }
+
+    .features-left .section-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #c9a84c;
+      margin-bottom: 20px;
+    }
+
+    .features-left h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 38px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .features-left p {
+      font-size: 15px;
+      color: #6b6860;
+      line-height: 1.8;
+      margin-bottom: 35px;
+    }
+
+    .features-right {
+      padding: 70px 50px;
+    }
+
+    .feature-item {
+      display: flex;
+      gap: 20px;
+      padding: 25px 0;
+      border-bottom: 1px solid rgba(201, 168, 76, 0.1);
+    }
+
+    .feature-item:last-child {
+      border-bottom: none;
+    }
+
+    .feature-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 30px;
+      font-weight: 700;
+      color: rgba(201, 168, 76, 0.15);
+      min-width: 40px;
+      line-height: 1;
+      transition: color 0.3s;
+    }
+
+    .feature-item:hover .feature-number {
+      color: #c9a84c;
+    }
+
+    .feature-item h3 {
+      font-size: 15px;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .feature-item p {
+      font-size: 13px;
+      color: #6b6860;
+      line-height: 1.65;
+    }
+
+    /* ===== STATS BAR ===== */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid rgba(201, 168, 76, 0.2);
+    }
+
+    .stat {
+      padding: 50px 30px;
+      border-right: 1px solid rgba(201, 168, 76, 0.2);
+      text-align: center;
+    }
+
+    .stat:last-child {
+      border-right: none;
+    }
+
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 42px;
+      font-weight: 700;
+      color: #c9a84c;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #6b6860;
+    }
+
+    /* ===== CALL TO ACTION SECTION ===== */
+    .cta {
+      margin: 0 50px 60px;
+      border: 1px solid rgba(201, 168, 76, 0.2);
+      padding: 70px;
+      text-align: center;
+    }
+
+    .cta h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 38px;
+      margin-bottom: 15px;
+    }
+
+    .cta p {
+      font-size: 15px;
+      color: #6b6860;
+      margin-bottom: 35px;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      border-top: 1px solid rgba(201, 168, 76, 0.2);
+      padding: 25px 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 14px;
+      color: #c9a84c;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 25px;
+    }
+
+    .footer-links a {
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #6b6860;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: #f5f2eb;
+    }
+
+    .footer-copy {
+      font-size: 11px;
+      color: #6b6860;
+    }
+
+    /* ===== MOBILE ===== */
+    @media (max-width: 768px) {
+      nav { padding: 15px 20px; }
+      .hero { grid-template-columns: 1fr; min-height: auto; }
+      .hero-left { padding: 60px 20px 50px; }
+      .hero-left h1 { font-size: 44px; }
+      .hero-right { display: none; }
+      .features { grid-template-columns: 1fr; }
+      .features-left { border-right: none; border-bottom: 1px solid rgba(201,168,76,0.2); padding: 40px 20px; }
+      .features-right { padding: 40px 20px; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .stat { border-bottom: 1px solid rgba(201,168,76,0.2); }
+      .cta { margin: 0 20px 40px; padding: 40px 20px; }
+      footer { padding: 20px; flex-direction: column; text-align: center; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAVIGATION ===== -->
+  <nav>
+    <div class="logo">ContentIQ</div>
+    <div class="nav-buttons">
+      <a href="/login" class="btn-outline">Log in</a>
+      <a href="/register" class="btn-gold">Get started</a>
+    </div>
+  </nav>
+
+  <!-- ===== HERO SECTION ===== -->
+  <section class="hero">
+
+    <!-- LEFT: headline text and buttons -->
+    <div class="hero-left">
+      <div class="hero-label">AI-Powered Intelligence</div>
+      <h1>Content that<br><em>thinks</em><br>for itself</h1>
+      <p>A unified platform for researchers and professionals who demand depth — SEO, AI detection, plagiarism, and beyond.</p>
+      <div class="hero-buttons">
+        <a href="/register" class="btn-gold">Start for free</a>
+        <a href="/login" class="link-text">Sign in →</a>
+      </div>
+    </div>
+
+    <!-- RIGHT: floating mock report card -->
+    <div class="hero-right">
+
+      <div class="hero-card">
+
+        <!-- Card title bar -->
+        <div class="card-topbar">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <span class="card-topbar-label">Live report</span>
+        </div>
+
+        <div class="card-body">
+
+          <!-- Four mini stat boxes -->
+          <div class="card-stats">
+            <div class="card-stat">
+              <div class="card-stat-val">24</div>
+              <div class="card-stat-lbl">Reports</div>
+            </div>
+            <div class="card-stat">
+              <div class="card-stat-val">92%</div>
+              <div class="card-stat-lbl">Success</div>
+            </div>
+            <div class="card-stat">
+              <div class="card-stat-val">3</div>
+              <div class="card-stat-lbl">Active</div>
+            </div>
+            <div class="card-stat">
+              <div class="card-stat-val">&lt;3s</div>
+              <div class="card-stat-lbl">Speed</div>
+            </div>
+          </div>
+
+          <!-- Analysis results list -->
+          <div class="card-section-title">Latest analysis</div>
+
+          <div class="card-result-row">
+            <div class="result-icon">📊</div>
+            <div class="result-info">
+              <div class="result-name">SEO Optimization</div>
+              <div class="result-bar-track">
+                <div class="result-bar-fill" style="width: 74%;"></div>
+              </div>
+            </div>
+            <div class="result-score">74%</div>
+          </div>
+
+          <div class="card-result-row">
+            <div class="result-icon">🤖</div>
+            <div class="result-info">
+              <div class="result-name">AI Content Detection</div>
+              <div class="result-bar-track">
+                <div class="result-bar-fill green" style="width: 12%;"></div>
+              </div>
+            </div>
+            <div class="result-score green">12%</div>
+          </div>
+
+          <div class="card-result-row">
+            <div class="result-icon">📄</div>
+            <div class="result-info">
+              <div class="result-name">Plagiarism Check</div>
+              <div class="result-bar-track">
+                <div class="result-bar-fill green" style="width: 3%;"></div>
+              </div>
+            </div>
+            <div class="result-score green">3%</div>
+          </div>
+
+          <div class="card-result-row">
+            <div class="result-icon">📝</div>
+            <div class="result-info">
+              <div class="result-name">Grammar &amp; Readability</div>
+              <div class="result-bar-track">
+                <div class="result-bar-fill" style="width: 88%;"></div>
+              </div>
+            </div>
+            <div class="result-score">88%</div>
+          </div>
+
+          <!-- Bottom status row -->
+          <div class="card-footer-row">
+            <span class="card-footer-label">blog_article.txt · Apr 8, 2026</span>
+            <span class="card-status-badge">✓ Complete</span>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ===== SCROLLING TICKER ===== -->
+  <div class="ticker">
+    <div class="ticker-track">
+      <span class="ticker-item"><span>—</span> SEO Optimization</span>
+      <span class="ticker-item"><span>—</span> AI Detection</span>
+      <span class="ticker-item"><span>—</span> Plagiarism Check</span>
+      <span class="ticker-item"><span>—</span> Content Humanizer</span>
+      <span class="ticker-item"><span>—</span> Grammar Analysis</span>
+      <span class="ticker-item"><span>—</span> Keyword Insights</span>
+      <span class="ticker-item"><span>—</span> Real-Time Reports</span>
+      <span class="ticker-item"><span>—</span> SEO Optimization</span>
+      <span class="ticker-item"><span>—</span> AI Detection</span>
+      <span class="ticker-item"><span>—</span> Plagiarism Check</span>
+      <span class="ticker-item"><span>—</span> Content Humanizer</span>
+      <span class="ticker-item"><span>—</span> Grammar Analysis</span>
+      <span class="ticker-item"><span>—</span> Keyword Insights</span>
+      <span class="ticker-item"><span>—</span> Real-Time Reports</span>
+    </div>
+  </div>
+
+  <!-- ===== FEATURES SECTION ===== -->
+  <section class="features">
+
+    <!-- Left: description + button -->
+    <div class="features-left">
+      <div class="section-label">Why ContentIQ</div>
+      <h2>Every tool your content needs, unified</h2>
+      <p>Stop juggling five different platforms. ContentIQ brings research-grade analysis into one clean workspace.</p>
+      <a href="/register" class="btn-gold">Start analyzing</a>
+    </div>
+
+    <!-- Right: numbered feature list -->
+    <div class="features-right">
+      <div class="feature-item">
+        <div class="feature-number">01</div>
+        <div>
+          <h3>SEO & Keyword Analysis</h3>
+          <p>Deep on-page scoring with keyword density, heading structure, and ranking recommendations.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-number">02</div>
+        <div>
+          <h3>AI Content Detection</h3>
+          <p>Identify AI-generated text with sentence-level precision and confidence scores.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-number">03</div>
+        <div>
+          <h3>Plagiarism & Originality</h3>
+          <p>Cross-reference against billions of indexed sources and academic journals instantly.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-number">04</div>
+        <div>
+          <h3>Grammar & Readability</h3>
+          <p>Grade-level scoring, clarity improvements, and style suggestions in real time.</p>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ===== STATS ===== -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-number">98%</div>
+      <div class="stat-label">Detection accuracy</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">6</div>
+      <div class="stat-label">Integrated tools</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">&lt;3s</div>
+      <div class="stat-label">Avg. report time</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">10k+</div>
+      <div class="stat-label">Reports generated</div>
+    </div>
+  </div>
+
+  <!-- ===== CALL TO ACTION ===== -->
+  <div class="cta">
+    <h2>Ready to elevate your content?</h2>
+    <p>Join researchers and professionals who rely on ContentIQ for serious analysis.</p>
+    <a href="/register" class="btn-gold">Create a free account</a>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="footer-logo">ContentIQ</div>
+    <div class="footer-links">
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+    </div>
+    <div class="footer-copy">© 2026 ContentIQ</div>
+  </footer>
+
+</body>
+</html>

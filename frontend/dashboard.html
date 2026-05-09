@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ContentIQ - Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #0a0a0f; color: #f5f2eb; font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* NAV */
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 0 50px; height: 58px; border-bottom: 1px solid rgba(201,168,76,0.2); background-color: rgba(10,10,15,0.95); position: sticky; top: 0; z-index: 100; }
+    .logo { font-family: 'Playfair Display', serif; font-size: 18px; color: #c9a84c; letter-spacing: 2px; text-transform: uppercase; }
+    .nav-links { display: flex; align-items: center; gap: 5px; }
+    .nav-a { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #6b6860; text-decoration: none; padding: 6px 12px; transition: color 0.2s; position: relative; }
+    .nav-a:hover { color: #f5f2eb; }
+    .nav-a.active { color: #f5f2eb; }
+    .nav-a.active::after { content: ""; position: absolute; bottom: -1px; left: 12px; right: 12px; height: 1px; background-color: #c9a84c; }
+    .nav-logout { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 6px 14px; border: 1px solid rgba(201,168,76,0.2); color: #6b6860; text-decoration: none; transition: all 0.2s; margin-left: 12px; background: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+    .nav-logout:hover { border-color: #c9a84c; color: #c9a84c; }
+
+    /* PAGE HEADER */
+    .page-header { padding: 40px 50px 30px; border-bottom: 1px solid rgba(201,168,76,0.2); display: flex; justify-content: space-between; align-items: flex-end; }
+    .header-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #c9a84c; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .header-label::before { content: ""; width: 20px; height: 1px; background-color: #c9a84c; }
+    .page-header h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; }
+    .page-header p { font-size: 14px; color: #6b6860; margin-top: 4px; }
+    .header-date { font-size: 12px; color: #6b6860; text-align: right; }
+
+    /* MAIN CONTENT */
+    .main { padding: 40px 50px; flex: 1; }
+
+    /* STATS ROW */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid rgba(201,168,76,0.2); margin-bottom: 40px; }
+    .stat-box { padding: 30px 25px; border-right: 1px solid rgba(201,168,76,0.2); transition: background-color 0.2s; }
+    .stat-box:last-child { border-right: none; }
+    .stat-box:hover { background-color: rgba(201,168,76,0.03); }
+    .stat-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #6b6860; margin-bottom: 10px; }
+    .stat-value { font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 700; line-height: 1; color: #f5f2eb; }
+    .stat-value.gold { color: #c9a84c; }
+    .stat-change { font-size: 12px; color: #6b6860; margin-top: 6px; }
+    .stat-change.up { color: #7ec87e; }
+
+    /* SECTION HEADING */
+    .section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .section-title { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #c9a84c; }
+    .section-link { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: #6b6860; text-decoration: none; transition: color 0.2s; }
+    .section-link:hover { color: #f5f2eb; }
+
+    /* ACTION CARDS */
+    .actions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background-color: rgba(201,168,76,0.2); border: 1px solid rgba(201,168,76,0.2); margin-bottom: 40px; }
+    .action-card { background-color: #0a0a0f; padding: 30px; transition: background-color 0.2s; }
+    .action-card:hover { background-color: rgba(201,168,76,0.04); }
+    .card-icon { font-size: 22px; margin-bottom: 18px; display: block; }
+    .card-title { font-size: 15px; font-weight: 500; margin-bottom: 8px; }
+    .card-desc { font-size: 13px; color: #6b6860; line-height: 1.65; margin-bottom: 20px; }
+    .btn-gold { display: inline-block; padding: 9px 20px; background-color: #c9a84c; color: #0a0a0f; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-weight: 500; text-decoration: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background-color 0.2s; }
+    .btn-gold:hover { background-color: #e8c97a; }
+    .btn-outline { display: inline-block; padding: 9px 20px; border: 1px solid rgba(201,168,76,0.2); color: #6b6860; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; text-decoration: none; transition: all 0.2s; }
+    .btn-outline:hover { border-color: #c9a84c; color: #c9a84c; }
+
+    /* RECENT REPORTS TABLE */
+    .reports-table { width: 100%; border-collapse: collapse; border: 1px solid rgba(201,168,76,0.2); }
+    .reports-table th { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #6b6860; padding: 12px 20px; text-align: left; border-bottom: 1px solid rgba(201,168,76,0.2); font-weight: 400; background-color: rgba(255,255,255,0.02); }
+    .reports-table td { font-size: 14px; padding: 12px 20px; border-bottom: 1px solid rgba(201,168,76,0.06); vertical-align: middle; }
+    .reports-table tr:last-child td { border-bottom: none; }
+    .reports-table tbody tr:hover td { background-color: rgba(201,168,76,0.025); }
+    .badge { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border: 1px solid; }
+    .badge.done { border-color: rgba(126,200,126,0.4); color: #7ec87e; }
+    .badge.proc { border-color: rgba(201,168,76,0.4); color: #c9a84c; }
+    .view-link { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: #6b6860; text-decoration: none; transition: color 0.2s; }
+    .view-link:hover { color: #c9a84c; }
+
+    /* FOOTER */
+    footer { border-top: 1px solid rgba(201,168,76,0.2); padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .footer-logo { font-family: 'Playfair Display', serif; font-size: 13px; color: #c9a84c; letter-spacing: 2px; text-transform: uppercase; }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: #6b6860; text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: #f5f2eb; }
+    .footer-copy { font-size: 11px; color: #6b6860; }
+
+    @media (max-width: 900px) {
+      nav { padding: 0 20px; }
+      .page-header { padding: 30px 20px; }
+      .main { padding: 25px 20px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .stat-box { border-bottom: 1px solid rgba(201,168,76,0.2); }
+      .actions-grid { grid-template-columns: 1fr; }
+      footer { padding: 15px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <div class="logo">ContentIQ</div>
+    <div class="nav-links">
+      <a href="/dashboard" class="nav-a active">Dashboard</a>
+      <a href="/reporthistory" class="nav-a">History</a>
+      <a href="/profile" class="nav-a">Profile</a>
+      <button type="button" class="nav-logout" id="logoutBtn">Log out</button>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <div class="header-label">Dashboard</div>
+      <h1 id="welcomeText">Welcome</h1>
+      <p>Your content intelligence overview</p>
+    </div>
+    <div class="header-date" id="dateDisplay"></div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- STATS ROW -->
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-label">Total reports</div>
+        <div class="stat-value">24</div>
+        <div class="stat-change up">↑ 3 this week</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Active analyses</div>
+        <div class="stat-value">3</div>
+        <div class="stat-change">In progress</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Completed</div>
+        <div class="stat-value">21</div>
+        <div class="stat-change up">↑ 87.5% rate</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Success rate</div>
+        <div class="stat-value gold">92%</div>
+        <div class="stat-change up">↑ All time high</div>
+      </div>
+    </div>
+
+    <!-- ACTION CARDS -->
+    <div class="section-head">
+      <div class="section-title">Quick actions</div>
+    </div>
+    <div class="actions-grid">
+      <div class="action-card">
+        <span class="card-icon">📤</span>
+        <div class="card-title">Upload content</div>
+        <p class="card-desc">Begin a new analysis session. Upload a file or paste your text to get started.</p>
+        <a href="/uploadcontent" class="btn-gold">Start new analysis</a>
+      </div>
+      <div class="action-card">
+        <span class="card-icon">📂</span>
+        <div class="card-title">Report history</div>
+        <p class="card-desc">Review all previous analyses, download reports, or revisit earlier results.</p>
+        <a href="/reporthistory" class="btn-outline">Open history</a>
+      </div>
+      <div class="action-card">
+        <span class="card-icon">👤</span>
+        <div class="card-title">Profile settings</div>
+        <p class="card-desc">Manage your account details, update credentials, and view usage stats.</p>
+        <a href="/profile" class="btn-outline">Manage profile</a>
+      </div>
+    </div>
+
+    <!-- RECENT REPORTS -->
+    <div class="section-head">
+      <div class="section-title">Recent reports</div>
+      <a href="/reporthistory" class="section-link">View all →</a>
+    </div>
+    <table class="reports-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>File</th>
+          <th>Services</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Apr 8, 2026</td>
+          <td>blog_article.txt</td>
+          <td>SEO, AI detection</td>
+          <td><span class="badge done">Completed</span></td>
+          <td><a href="/result" class="view-link">View →</a></td>
+        </tr>
+        <tr>
+          <td>Apr 7, 2026</td>
+          <td>assignment.docx</td>
+          <td>Plagiarism</td>
+          <td><span class="badge done">Completed</span></td>
+          <td><a href="/result" class="view-link">View →</a></td>
+        </tr>
+        <tr>
+          <td>Apr 6, 2026</td>
+          <td>seo_report.pdf</td>
+          <td>SEO</td>
+          <td><span class="badge proc">Processing</span></td>
+          <td><a href="/result" class="view-link">View →</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">ContentIQ</div>
+    <div class="footer-links">
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+      <a href="#">Privacy</a>
+    </div>
+    <div class="footer-copy">2026 ContentIQ</div>
+  </footer>
+
+  <script>
+    // Auth guard
+    const token = localStorage.getItem("contentIQToken");
+    const loggedInUser = JSON.parse(localStorage.getItem("contentIQUser"));
+
+    if (!token || !loggedInUser) {
+      localStorage.removeItem("contentIQToken");
+      localStorage.removeItem("contentIQUser");
+      window.location.href = "/login";
+    } else {
+      document.getElementById("welcomeText").textContent = "Welcome, " + loggedInUser.fullName;
+    }
+
+    // Show today's date
+    const today = new Date();
+    document.getElementById("dateDisplay").textContent = today.toLocaleDateString("en-US", {
+      weekday: "long", year: "numeric", month: "long", day: "numeric"
+    });
+
+    // Load real stats + recent reports from API
+    async function loadDashboard() {
+      try {
+        const response = await fetch("/api/analyze/history", {
+          headers: { "Authorization": "Bearer " + token }
+        });
+
+        if (response.status === 401) {
+          // Token is expired or invalid — clear everything and go to login
+          localStorage.removeItem("contentIQToken");
+          localStorage.removeItem("contentIQUser");
+          localStorage.removeItem("contentIQUploadData");
+          localStorage.removeItem("contentIQSelectedServices");
+          localStorage.removeItem("contentIQResults");
+          window.location.href = "/login";
+          return;
+        }
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const s = data.stats;
+
+        // Update stat boxes
+        const statValues = document.querySelectorAll(".stat-value");
+        statValues[0].textContent = s.total;
+        statValues[1].textContent = s.processing;
+        statValues[2].textContent = s.completed;
+        statValues[3].textContent = s.successRate + "%";
+
+        // Update recent reports table
+        const tbody = document.querySelector(".reports-table tbody");
+        tbody.innerHTML = "";
+
+        const recent = data.reports.slice(0, 5);
+        if (recent.length === 0) {
+          tbody.innerHTML = "<tr><td colspan='5' style='color:#6b6860;text-align:center;padding:20px;'>No reports yet. Start your first analysis!</td></tr>";
+          return;
+        }
+
+        recent.forEach(function(r) {
+          const date = new Date(r.createdAt).toLocaleDateString("en-US", {
+            month: "short", day: "numeric", year: "numeric"
+          });
+          const svcNames = r.services.map(function(s) {
+            var clean = s.replace(/_/g, " ");
+            return clean.charAt(0).toUpperCase() + clean.slice(1);
+          }).join(", ");
+          const statusClass = r.status === "completed" ? "done" : "proc";
+          const statusText  = r.status === "completed" ? "Completed" : "Processing";
+          const fileName    = r.fileName || "Pasted text";
+
+          const tr = document.createElement("tr");
+          tr.innerHTML =
+            "<td>" + date + "</td>" +
+            "<td>" + fileName + "</td>" +
+            "<td>" + svcNames + "</td>" +
+            "<td><span class=\"badge " + statusClass + "\">" + statusText + "</span></td>" +
+            "<td><a href=\"/reporthistory\" class=\"view-link\">View →</a></td>";
+          tbody.appendChild(tr);
+        });
+
+      } catch(err) {
+        console.error("Dashboard load error:", err);
+      }
+    }
+
+    loadDashboard();
+
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", function () {
+      localStorage.removeItem("contentIQToken");
+      localStorage.removeItem("contentIQUser");
+      localStorage.removeItem("contentIQUploadData");
+      localStorage.removeItem("contentIQSelectedServices");
+      localStorage.removeItem("contentIQResults");
+      window.location.href = "/";
+    });
+  </script>
+
+</body>
+</html>

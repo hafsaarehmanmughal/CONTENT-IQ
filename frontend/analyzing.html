@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ContentIQ - Processing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #0a0a0f; color: #f5f2eb; font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; display: flex; flex-direction: column; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 0 50px; height: 58px; border-bottom: 1px solid rgba(201,168,76,0.2); }
+    .logo { font-family: 'Playfair Display', serif; font-size: 18px; color: #c9a84c; letter-spacing: 2px; text-transform: uppercase; }
+    .nav-a { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #6b6860; text-decoration: none; transition: color 0.2s; }
+    .nav-a:hover { color: #f5f2eb; }
+
+    .center-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+
+    .proc-card { border: 1px solid rgba(201,168,76,0.2); padding: 55px 50px; width: 100%; max-width: 460px; text-align: center; }
+
+    .spinner-wrap { width: 80px; height: 80px; margin: 0 auto 35px; position: relative; }
+    .ring-outer { position: absolute; inset: 0; border-radius: 50%; border: 2px solid transparent; border-top-color: #c9a84c; border-right-color: rgba(201,168,76,0.3); animation: spin 1.4s linear infinite; }
+    .ring-mid { position: absolute; inset: 12px; border-radius: 50%; border: 1px solid transparent; border-top-color: rgba(201,168,76,0.5); animation: spin 2s linear infinite reverse; }
+    .ring-inner { position: absolute; inset: 24px; border-radius: 50%; border: 1px solid transparent; border-top-color: rgba(201,168,76,0.3); animation: spin 2.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .proc-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #c9a84c; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .proc-label::before, .proc-label::after { content: ""; width: 20px; height: 1px; background-color: #c9a84c; }
+
+    .proc-card h2 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 10px; }
+    .proc-status { font-size: 14px; color: #6b6860; margin-bottom: 35px; }
+
+    .steps-list { text-align: left; border-top: 1px solid rgba(201,168,76,0.15); padding-top: 25px; }
+    .step-item { display: flex; align-items: center; gap: 15px; padding: 10px 0; border-bottom: 1px solid rgba(201,168,76,0.06); font-size: 14px; color: #6b6860; }
+    .step-item:last-child { border-bottom: none; }
+
+    .step-item.done { color: #f5f2eb; }
+    .step-item.active { color: #c9a84c; font-weight: 500; }
+
+    .step-dot { width: 26px; height: 26px; border-radius: 50%; border: 1px solid rgba(201,168,76,0.25); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; color: transparent; }
+
+    .step-item.done .step-dot { border-color: rgba(126,200,126,0.5); background-color: rgba(126,200,126,0.1); color: #7ec87e; }
+    .step-item.active .step-dot { border-color: #c9a84c; background-color: rgba(201,168,76,0.1); color: #c9a84c; animation: pulse 1.3s infinite; }
+
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.3); }
+      50% { box-shadow: 0 0 0 6px rgba(201,168,76,0); }
+    }
+
+    .cancel-link { display: block; margin-top: 25px; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: #6b6860; text-decoration: none; }
+    .cancel-link:hover { color: #f5f2eb; }
+
+    footer { border-top: 1px solid rgba(201,168,76,0.2); padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; }
+    .footer-logo { font-family: 'Playfair Display', serif; font-size: 13px; color: #c9a84c; letter-spacing: 2px; text-transform: uppercase; }
+    .footer-copy { font-size: 11px; color: #6b6860; }
+  </style>
+</head>
+
+<body>
+
+<nav>
+  <div class="logo">ContentIQ</div>
+  <a href="/dashboard" class="nav-a">Dashboard</a>
+</nav>
+
+<div class="center-wrap">
+  <div class="proc-card">
+
+    <div class="spinner-wrap">
+      <div class="ring-outer"></div>
+      <div class="ring-mid"></div>
+      <div class="ring-inner"></div>
+    </div>
+
+    <div class="proc-label">Processing</div>
+    <h2>Analyzing your content</h2>
+    <div class="proc-status" id="statusMsg">Initializing analysis engine...</div>
+
+    <div class="steps-list">
+      <div class="step-item done" id="step1">
+        <div class="step-dot">✓</div>
+        Upload received and validated
+      </div>
+
+      <div class="step-item active" id="step2">
+        <div class="step-dot">◌</div>
+        Running multi-service analysis
+      </div>
+
+      <div class="step-item" id="step3">
+        <div class="step-dot">—</div>
+        Compiling results and insights
+      </div>
+
+      <div class="step-item" id="step4">
+        <div class="step-dot">—</div>
+        Finalizing and generating report
+      </div>
+    </div>
+
+    <a href="/dashboard" class="cancel-link">Cancel and return to dashboard</a>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">ContentIQ</div>
+  <div class="footer-copy">2026 ContentIQ</div>
+</footer>
+
+<script>
+window.onload = async function() {
+
+  // Auth guard
+  const token = localStorage.getItem("contentIQToken");
+  const user  = JSON.parse(localStorage.getItem("contentIQUser"));
+  if (!token || !user) {
+    localStorage.removeItem("contentIQToken"); localStorage.removeItem("contentIQUser"); window.location.href = "/login";
+    return;
+  }
+
+  // Get upload data and selected services from previous steps
+  const uploadData    = JSON.parse(localStorage.getItem("contentIQUploadData"));
+  const serviceData   = JSON.parse(localStorage.getItem("contentIQSelectedServices"));
+
+  if (!uploadData || !serviceData) {
+    alert("Missing content or services. Please start again.");
+    window.location.href = "/uploadcontent";
+    return;
+  }
+
+  function updateStep(currentId, nextId, message) {
+    var current = document.getElementById(currentId);
+    current.classList.remove('active');
+    current.classList.add('done');
+    current.querySelector('.step-dot').textContent = '✓';
+    if (nextId) {
+      var next = document.getElementById(nextId);
+      next.classList.add('active');
+      next.querySelector('.step-dot').textContent = '◌';
+    }
+    document.getElementById('statusMsg').textContent = message;
+  }
+
+  // Step 2 → 3 after short delay to show animation
+  setTimeout(function(){ updateStep('step2','step3','Running AI analysis engines...'); }, 1200);
+
+  try {
+    // Get text content (either pasted text or file placeholder)
+    const textContent = uploadData.text || ("File uploaded: " + (uploadData.file ? uploadData.file.name : "unknown"));
+
+    // Call the real API
+    const response = await fetch("/api/analyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({
+        text: textContent,
+        services: serviceData.services
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      updateStep('step3','step4','Finalizing report...');
+
+      // Save results to localStorage so result.html can read them
+      localStorage.setItem("contentIQResults", JSON.stringify({
+        reportId: data.reportId,
+        results:  data.results,
+        services: serviceData.services
+      }));
+
+      setTimeout(function(){
+        updateStep('step4', null, 'Done! Redirecting...');
+      }, 800);
+
+      setTimeout(function(){
+        window.location.href = '/result';
+      }, 1600);
+
+    } else {
+      document.getElementById('statusMsg').textContent = data.message || 'Analysis failed.';
+      setTimeout(function(){ window.location.href = '/uploadcontent'; }, 3000);
+    }
+
+  } catch (err) {
+    console.error("Analysis error:", err);
+    document.getElementById('statusMsg').textContent = 'Connection error. Please try again.';
+    setTimeout(function(){ window.location.href = '/uploadcontent'; }, 3000);
+  }
+};
+</script>
+
+</body>
+</html>

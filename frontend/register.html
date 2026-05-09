@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ContentIQ - Create Account</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #0a0a0f; color: #f5f2eb; font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; display: flex; flex-direction: column; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 18px 50px; border-bottom: 1px solid rgba(201,168,76,0.2); }
+    .logo { font-family: 'Playfair Display', serif; font-size: 20px; color: #c9a84c; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; }
+    .nav-link { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: #6b6860; text-decoration: none; transition: color 0.2s; }
+    .nav-link:hover { color: #f5f2eb; }
+    .page-body { flex: 1; display: grid; grid-template-columns: 1fr 1fr; }
+    .left-panel { padding: 70px 60px; border-right: 1px solid rgba(201,168,76,0.2); display: flex; flex-direction: column; justify-content: center; }
+    .panel-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #c9a84c; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    .panel-label::before { content: ""; width: 25px; height: 1px; background-color: #c9a84c; }
+    .left-panel h2 { font-family: 'Playfair Display', serif; font-size: 38px; line-height: 1.1; margin-bottom: 20px; }
+    .left-panel h2 em { font-style: italic; color: #c9a84c; }
+    .left-panel p { font-size: 15px; color: #6b6860; line-height: 1.8; margin-bottom: 30px; }
+    .plan-card { border: 1px solid rgba(201,168,76,0.2); padding: 18px 20px; margin-bottom: 12px; transition: border-color 0.2s; }
+    .plan-card:hover { border-color: #c9a84c; }
+    .plan-name { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #c9a84c; margin-bottom: 5px; }
+    .plan-desc { font-size: 13px; color: #6b6860; }
+    .right-panel { display: flex; align-items: center; justify-content: center; padding: 50px 60px; }
+    .form-box { width: 100%; max-width: 400px; }
+    .form-box h3 { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+    .form-box .subtitle { font-size: 14px; color: #6b6860; margin-bottom: 30px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .field { margin-bottom: 18px; }
+    .field label { display: block; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #6b6860; margin-bottom: 8px; }
+    .field input { width: 100%; padding: 12px 15px; background-color: rgba(255,255,255,0.04); border: 1px solid rgba(201,168,76,0.2); color: #f5f2eb; font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
+    .field input:focus { border-color: #c9a84c; }
+    .field input::placeholder { color: rgba(107,104,96,0.5); }
+    .submit-btn { width: 100%; padding: 13px; background-color: #c9a84c; color: #0a0a0f; font-family: 'DM Sans', sans-serif; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; border: none; cursor: pointer; margin-top: 5px; transition: background-color 0.2s; }
+    .submit-btn:hover { background-color: #e8c97a; }
+    .terms { font-size: 12px; color: #6b6860; text-align: center; margin-top: 15px; line-height: 1.6; }
+    .terms a { color: #c9a84c; text-decoration: none; }
+    .form-footer { font-size: 13px; color: #6b6860; text-align: center; margin-top: 15px; }
+    .form-footer a { color: #c9a84c; text-decoration: none; }
+    footer { border-top: 1px solid rgba(201,168,76,0.2); padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; }
+    .footer-logo { font-family: 'Playfair Display', serif; font-size: 13px; color: #c9a84c; letter-spacing: 2px; text-transform: uppercase; }
+    .footer-copy { font-size: 11px; color: #6b6860; }
+    @media (max-width: 768px) { nav { padding: 15px 20px; } .page-body { grid-template-columns: 1fr; } .left-panel { display: none; } .right-panel { padding: 40px 20px; } .field-row { grid-template-columns: 1fr; } footer { padding: 15px 20px; } }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="logo">ContentIQ</a>
+    <a href="/login" class="nav-link">Already have an account? Sign in</a>
+  </nav>
+
+  <div class="page-body">
+    <div class="left-panel">
+      <div class="panel-label">Get started</div>
+      <h2>Where great<br>content gets<br><em>smarter</em></h2>
+      <p>Join researchers and professionals who trust ContentIQ for accurate, multi-tool content intelligence.</p>
+      <div class="plan-card">
+        <div class="plan-name">Free plan</div>
+        <div class="plan-desc">5 analyses per month, all core tools included.</div>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name">Pro plan</div>
+        <div class="plan-desc">Unlimited analyses, priority processing, PDF exports.</div>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="form-box">
+        <h3>Create account</h3>
+        <div class="subtitle">Start analyzing your content today</div>
+
+        <form id="registerForm">
+          <div class="field-row">
+            <div class="field">
+              <label>First name</label>
+              <input type="text" id="firstName" placeholder="Sarah" required>
+            </div>
+            <div class="field">
+              <label>Last name</label>
+              <input type="text" id="lastName" placeholder="Johnson" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Email address</label>
+            <input type="email" id="email" placeholder="you@university.edu" required>
+          </div>
+
+          <div class="field">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Minimum 8 characters" required>
+          </div>
+
+          <div class="field">
+            <label>Confirm password</label>
+            <input type="password" id="confirmPassword" placeholder="Re-enter password" required>
+          </div>
+
+          <button type="submit" class="submit-btn">Create my account</button>
+        </form>
+
+        <div class="terms">By signing up you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</div>
+        <div class="form-footer">Already have an account? <a href="/login">Sign in</a></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-logo">ContentIQ</div>
+    <div class="footer-copy">2026 ContentIQ. All rights reserved.</div>
+  </footer>
+
+  <script>
+    const registerForm = document.getElementById("registerForm");
+    const submitBtn = registerForm.querySelector(".submit-btn");
+
+    registerForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const firstName = document.getElementById("firstName").value.trim();
+      const lastName = document.getElementById("lastName").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const confirmPassword = document.getElementById("confirmPassword").value.trim();
+
+      if (!firstName || !lastName || !email || !password || !confirmPassword) {
+        alert("Please fill all fields.");
+        return;
+      }
+
+      if (password.length < 8) {
+        alert("Password must be at least 8 characters.");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+      }
+
+      const fullName = `${firstName} ${lastName}`;
+
+      submitBtn.textContent = "Creating account...";
+      submitBtn.disabled = true;
+
+      try {
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fullName, email, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert("Account created! Please sign in.");
+          window.location.href = "/login";
+        } else {
+          alert(data.message || "Registration failed.");
+          submitBtn.textContent = "Create my account";
+          submitBtn.disabled = false;
+        }
+      } catch (error) {
+        console.error("Register error:", error);
+        alert("Could not connect to server. Make sure the backend is running.");
+        submitBtn.textContent = "Create my account";
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
