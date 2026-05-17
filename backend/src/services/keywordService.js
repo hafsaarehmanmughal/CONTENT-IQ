@@ -1,99 +1,75 @@
-// ============================================================
-// KEYWORD ANALYSIS SERVICE
-// Powered by Google Gemini
-// What it does:
-//   - Identifies what people search for related to this content
-//   - Extracts existing keywords from the text
-//   - Suggests new keywords to target for better search visibility
-//   - Shows keyword difficulty and search intent
-//   - Explains how to use each keyword
-// ============================================================
-
+// KEYWORD ANALYSIS SERVICE — Professional Grade
 const { callGemini } = require("./geminiHelper");
 
 async function analyzeKeywords(text) {
-  const prompt = `You are a professional SEO keyword research expert. Analyze the following content and provide comprehensive keyword analysis.
+  const prompt = `You are a professional keyword research expert like Google Keyword Planner and SEMrush Keyword Magic Tool. Analyze the content and provide complete keyword intelligence.
 
-CONTENT TO ANALYZE:
+CONTENT:
 """
-${text.substring(0, 3000)}
+${text.substring(0, 2500)}
 """
 
-Your tasks:
-1. Identify the main topic and search intent of this content
-2. Extract keywords already present in the text
-3. Suggest new high-value keywords this content should target
-4. Identify long-tail keyword opportunities
-5. Analyze keyword density of existing keywords
-6. Suggest how to incorporate missing keywords
+Provide comprehensive keyword analysis as a professional SEO tool would.
 
-Respond ONLY with a valid JSON object. No text before or after:
+Respond ONLY with valid JSON:
 {
-  "score": <number 0-100 keyword optimization score>,
-  "badge": "<one of: Highly Optimized, Well Optimized, Needs Optimization, Poor>",
-  "mainTopic": "<the main topic of the content>",
-  "searchIntent": "<what users are searching for — Informational / Commercial / Transactional / Navigational>",
+  "score": <keyword optimization score 0-100>,
+  "badge": "<Highly Optimized | Well Optimized | Needs Optimization | Poor>",
+  "mainTopic": "<detected main topic>",
+  "searchIntent": "<Informational | Commercial | Transactional | Navigational>",
+  "primaryKeyword": "<the most important keyword in the content>",
+  "primaryKeywordDensity": "<percentage>",
   "existingKeywords": [
-    { "keyword": "<keyword already in text>", "frequency": <how many times>, "density": "<percentage>%", "assessment": "<good/overused/underused>" }
+    { "keyword": "<keyword in text>", "frequency": <number>, "density": "<percentage>", "assessment": "<Good | Overused | Underused>", "searchVolume": "<High | Medium | Low>" },
+    { "keyword": "<keyword>", "frequency": <number>, "density": "<percentage>", "assessment": "<assessment>", "searchVolume": "<volume>" },
+    { "keyword": "<keyword>", "frequency": <number>, "density": "<percentage>", "assessment": "<assessment>", "searchVolume": "<volume>" }
   ],
   "suggestedKeywords": [
-    { "keyword": "<keyword to add>", "searchVolume": "<High/Medium/Low>", "difficulty": "<Easy/Medium/Hard>", "intent": "<why users search this>", "howToUse": "<where/how to add this keyword>" },
-    { "keyword": "<keyword>", "searchVolume": "<High/Medium/Low>", "difficulty": "<Easy/Medium/Hard>", "intent": "<why>", "howToUse": "<where>" },
-    { "keyword": "<keyword>", "searchVolume": "<High/Medium/Low>", "difficulty": "<Easy/Medium/Hard>", "intent": "<why>", "howToUse": "<where>" },
-    { "keyword": "<keyword>", "searchVolume": "<High/Medium/Low>", "difficulty": "<Easy/Medium/Hard>", "intent": "<why>", "howToUse": "<where>" },
-    { "keyword": "<keyword>", "searchVolume": "<High/Medium/Low>", "difficulty": "<Easy/Medium/Hard>", "intent": "<why>", "howToUse": "<where>" }
+    { "keyword": "<keyword to add>", "searchVolume": "<High | Medium | Low>", "difficulty": "<Easy | Medium | Hard>", "cpc": "<Low | Medium | High>", "intent": "<why users search this>", "trend": "<Rising | Stable | Declining>", "howToUse": "<where and how to add this keyword>" },
+    { "keyword": "<keyword>", "searchVolume": "<volume>", "difficulty": "<difficulty>", "cpc": "<cpc>", "intent": "<intent>", "trend": "<trend>", "howToUse": "<how>" },
+    { "keyword": "<keyword>", "searchVolume": "<volume>", "difficulty": "<difficulty>", "cpc": "<cpc>", "intent": "<intent>", "trend": "<trend>", "howToUse": "<how>" },
+    { "keyword": "<keyword>", "searchVolume": "<volume>", "difficulty": "<difficulty>", "cpc": "<cpc>", "intent": "<intent>", "trend": "<trend>", "howToUse": "<how>" },
+    { "keyword": "<keyword>", "searchVolume": "<volume>", "difficulty": "<difficulty>", "cpc": "<cpc>", "intent": "<intent>", "trend": "<trend>", "howToUse": "<how>" }
   ],
   "longTailKeywords": [
-    "<long tail keyword phrase 1>",
-    "<long tail keyword phrase 2>",
-    "<long tail keyword phrase 3>"
+    { "phrase": "<long tail phrase>", "searchVolume": "<Low | Very Low>", "difficulty": "<Easy | Very Easy>", "opportunity": "<High | Medium>" },
+    { "phrase": "<phrase>", "searchVolume": "<volume>", "difficulty": "<difficulty>", "opportunity": "<opportunity>" },
+    { "phrase": "<phrase>", "searchVolume": "<volume>", "difficulty": "<difficulty>", "opportunity": "<opportunity>" }
   ],
+  "questionKeywords": ["<question people ask about this topic>", "<question 2>", "<question 3>"],
+  "semanticKeywords": ["<semantically related keyword>", "<keyword 2>", "<keyword 3>", "<keyword 4>"],
+  "keywordClusters": [
+    { "cluster": "<cluster name>", "keywords": ["<keyword 1>", "<keyword 2>", "<keyword 3>"] },
+    { "cluster": "<cluster>", "keywords": ["<keyword>", "<keyword>"] }
+  ],
+  "contentIdeas": ["<content idea based on keyword gap 1>", "<idea 2>", "<idea 3>"],
   "insights": [
     { "label": "Keyword Score", "value": "<score>/100" },
-    { "label": "Main Topic", "value": "<topic>" },
+    { "label": "Primary Keyword", "value": "<keyword> (<density>%)" },
     { "label": "Search Intent", "value": "<intent>" },
-    { "label": "Existing Keywords", "value": "<number> keywords found in text" },
-    { "label": "Top Suggested Keyword", "value": "<best keyword to add>" },
-    { "label": "Long-tail Opportunities", "value": "<number> long-tail phrases identified" }
+    { "label": "Keywords Found", "value": "<number> keywords in content" },
+    { "label": "Top Opportunity", "value": "<best keyword to add>" },
+    { "label": "Long-tail Opportunities", "value": "<number> phrases identified" },
+    { "label": "Question Keywords", "value": "<number> questions to target" },
+    { "label": "Keyword Clusters", "value": "<number> topic clusters detected" }
   ],
   "recommendations": [
-    "<specific keyword recommendation 1>",
-    "<recommendation 2>",
-    "<recommendation 3>",
-    "<recommendation 4>"
+    "<specific keyword action 1>",
+    "<action 2>",
+    "<action 3>",
+    "<action 4>",
+    "<action 5>"
   ]
 }`;
 
   try {
     const raw = await callGemini(prompt);
     const result = JSON.parse(raw);
-
-    return {
-      score: result.score || 60,
-      badge: result.badge || "Needs Optimization",
-      color: "gold",
-      icon: "🔑",
-      name: "Keyword Analysis",
-      mainTopic: result.mainTopic,
-      searchIntent: result.searchIntent,
-      existingKeywords: result.existingKeywords || [],
-      suggestedKeywords: result.suggestedKeywords || [],
-      longTailKeywords: result.longTailKeywords || [],
-      insights: result.insights || [],
-      recommendations: result.recommendations || [],
-    };
+    return { score: result.score || 60, badge: result.badge || "Needs Optimization", color: "gold", icon: "🔑", name: "Keyword Analysis", ...result };
   } catch (err) {
     console.error("Keyword Error:", err.message);
-    return errorResult("Keyword Analysis", "🔑", err.message);
+    return { score: 0, badge: "Error", color: "warn", icon: "🔑", name: "Keyword Analysis", insights: [{ label: "Error", value: err.message }], recommendations: ["Please check your GROQ_API_KEY and try again."] };
   }
-}
-
-function errorResult(name, icon, message) {
-  return {
-    score: 0, badge: "Error", color: "warn", icon, name,
-    insights: [{ label: "Error", value: message }],
-    recommendations: ["Please check your Gemini API key in the .env file and try again."],
-  };
 }
 
 module.exports = { analyzeKeywords };

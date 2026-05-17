@@ -1,56 +1,59 @@
-// ============================================================
-// CONTENT HUMANIZER SERVICE
-// Powered by Google Gemini
-// What it does:
-//   - Fully rewrites the content to sound naturally human
-//   - Ensures the rewritten text would pass AI detection
-//   - Ensures no plagiarism in the rewritten version
-//   - Keeps the same meaning and information
-//   - Adds personal voice, varied sentence structure, contractions
-// ============================================================
-
+// CONTENT HUMANIZER SERVICE — Professional Grade
 const { callGemini } = require("./geminiHelper");
 
 async function analyzeHumanizer(text) {
-  const prompt = `You are a professional content humanizer. Your job is to rewrite the given text so that:
-1. It sounds completely natural and human-written
-2. It would pass ANY AI detection tool (GPTZero, Originality.ai, etc.)
-3. It has zero plagiarism — completely original phrasing
-4. The same meaning and information is preserved
-5. It has varied sentence lengths (mix short and long sentences)
-6. It uses natural contractions (don't, can't, it's, they're)
-7. It has personal voice and occasional informal expressions
-8. It avoids robotic transitions like "Furthermore", "Moreover", "Additionally"
-9. It feels like a real person wrote it with their own unique style
+  const prompt = `You are a professional content humanizer like Undetectable AI and QuillBot. Rewrite the content to sound completely natural and human-written.
 
 ORIGINAL CONTENT:
 """
-${text.substring(0, 3000)}
+${text.substring(0, 2500)}
 """
 
-Respond ONLY with a valid JSON object. No text before or after:
+Rules for humanization:
+1. Vary sentence lengths dramatically — mix very short sentences with longer ones
+2. Add natural contractions (don't, can't, it's, they're, I'm, you'll)
+3. Remove ALL robotic transitions (Furthermore, Moreover, Additionally, In conclusion, It is important to note)
+4. Add conversational phrases and natural flow
+5. Include occasional informal expressions
+6. Add personal perspective where appropriate
+7. Use active voice instead of passive
+8. Remove perfectly balanced paragraph structures
+9. The result MUST pass AI detection tools
+10. Preserve all original information and meaning
+
+Respond ONLY with valid JSON:
 {
-  "humanizedText": "<the complete fully rewritten human-sounding version of the text>",
-  "originalAIScore": <number 0-100, estimated AI probability of original>,
-  "humanizedAIScore": <number 0-100, estimated AI probability of humanized version — should be low>,
-  "score": <number 0-100, humanness quality of rewritten text — should be high>,
-  "badge": "<one of: Highly Human, Mostly Human, Partially Human>",
-  "changesSummary": "<brief summary of main changes made>",
-  "techniquesUsed": [
-    "<technique 1 used to humanize>",
-    "<technique 2>",
-    "<technique 3>"
+  "score": <number 0-100, humanness quality of rewritten text>,
+  "badge": "<Highly Human | Mostly Human | Partially Human>",
+  "originalAIScore": <estimated AI probability of original 0-100>,
+  "humanizedAIScore": <estimated AI probability of rewritten version 0-100, should be much lower>,
+  "humanizedText": "<the complete fully rewritten human-sounding version>",
+  "version2": "<an alternative rewrite with different tone — more casual>",
+  "changesMade": [
+    { "original": "<original phrase>", "changed": "<new phrase>", "reason": "<why this change helps>" },
+    { "original": "<phrase>", "changed": "<new>", "reason": "<reason>" },
+    { "original": "<phrase>", "changed": "<new>", "reason": "<reason>" }
   ],
+  "techniquesUsed": [
+    "<technique 1 applied>",
+    "<technique 2>",
+    "<technique 3>",
+    "<technique 4>"
+  ],
+  "plagiarismRisk": "Very Low — completely rewritten in original voice",
+  "toneApplied": "<conversational | professional | academic>",
   "insights": [
     { "label": "Original AI Probability", "value": "<percentage>%" },
-    { "label": "Humanized AI Probability", "value": "<percentage>% (much lower)" },
+    { "label": "Humanized AI Probability", "value": "<percentage>% (reduced by <reduction>%)" },
     { "label": "Humanness Score", "value": "<score>/100" },
-    { "label": "Plagiarism Risk", "value": "Very Low — completely rewritten" },
-    { "label": "Tone Applied", "value": "<conversational/professional/academic>" },
-    { "label": "Key Changes", "value": "<brief summary>" }
+    { "label": "Plagiarism Risk", "value": "Very Low" },
+    { "label": "Tone Applied", "value": "<tone>" },
+    { "label": "Changes Made", "value": "<number> significant rewrites" },
+    { "label": "AI Patterns Removed", "value": "<number> robotic patterns eliminated" },
+    { "label": "Will Pass AI Detectors", "value": "<Yes | Likely | Partially>" }
   ],
   "recommendations": [
-    "<tip to further personalize the content>",
+    "<tip to further personalize>",
     "<tip 2>",
     "<tip 3>"
   ]
@@ -59,33 +62,11 @@ Respond ONLY with a valid JSON object. No text before or after:
   try {
     const raw = await callGemini(prompt);
     const result = JSON.parse(raw);
-
-    return {
-      score: result.score || 85,
-      badge: result.badge || "Mostly Human",
-      color: "gold",
-      icon: "✨",
-      name: "Content Humanizer",
-      humanizedText: result.humanizedText,
-      originalAIScore: result.originalAIScore,
-      humanizedAIScore: result.humanizedAIScore,
-      changesSummary: result.changesSummary,
-      techniquesUsed: result.techniquesUsed || [],
-      insights: result.insights || [],
-      recommendations: result.recommendations || [],
-    };
+    return { score: result.score || 85, badge: result.badge || "Mostly Human", color: "gold", icon: "✨", name: "Content Humanizer", ...result };
   } catch (err) {
     console.error("Humanizer Error:", err.message);
-    return errorResult("Content Humanizer", "✨", err.message);
+    return { score: 0, badge: "Error", color: "warn", icon: "✨", name: "Content Humanizer", insights: [{ label: "Error", value: err.message }], recommendations: ["Please check your GROQ_API_KEY and try again."] };
   }
-}
-
-function errorResult(name, icon, message) {
-  return {
-    score: 0, badge: "Error", color: "warn", icon, name,
-    insights: [{ label: "Error", value: message }],
-    recommendations: ["Please check your Gemini API key in the .env file and try again."],
-  };
 }
 
 module.exports = { analyzeHumanizer };

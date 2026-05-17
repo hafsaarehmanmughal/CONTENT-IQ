@@ -1,101 +1,59 @@
-// ============================================================
-// PLAGIARISM CHECKER SERVICE
-// Powered by Google Gemini
-// What it does:
-//   - Detects sentences/phrases that appear copied or plagiarized
-//   - Identifies common phrases that match known web content
-//   - Flags sentences that look like direct copies from sources
-//   - Gives an originality score
-//   - Suggests how to rewrite plagiarized sections
-// NOTE: Cannot check live internet (requires Turnitin database)
-//       But accurately identifies copied phrasing patterns,
-//       well-known quotes, and common template text
-// ============================================================
-
+// PLAGIARISM CHECKER SERVICE — Professional Grade
 const { callGemini } = require("./geminiHelper");
 
 async function analyzeSimilarity(text) {
-  const prompt = `You are a professional plagiarism detection expert. Analyze the following text for plagiarism and originality.
+  const prompt = `You are a professional plagiarism detection expert like Turnitin and Grammarly. Analyze the content for plagiarism, copied sentences, and originality issues.
 
-CONTENT TO ANALYZE:
+CONTENT:
 """
-${text.substring(0, 3000)}
+${text.substring(0, 2500)}
 """
 
-Carefully examine this text for:
-1. Sentences or phrases that appear to be copied from well-known sources, books, websites, or common templates
-2. Generic phrases that are widely used across the internet
-3. Text that matches common academic or professional writing templates
-4. Famous quotes or well-known statements used without citation
-5. Overly common expressions that reduce originality
-6. Sections that sound like they were copied from Wikipedia or similar sources
+Check for: copied phrases, common templates, Wikipedia-style sentences, academic clichés, duplicate internal phrases, and unoriginal expressions. Be very specific about what looks copied and why.
 
-Important: Be specific about which sentences look plagiarized and why.
-
-Respond ONLY with a valid JSON object. No text before or after:
+Respond ONLY with valid JSON:
 {
-  "originalityScore": <number 0-100, where 100 = completely original>,
-  "score": <same as originalityScore>,
-  "badge": "<one of: Highly Original, Mostly Original, Partially Original, High Plagiarism Risk>",
-  "plagiarismRisk": "<Low / Medium / High>",
+  "score": <originality score 0-100, where 100 = fully original>,
+  "badge": "<Highly Original | Mostly Original | Partially Original | High Plagiarism Risk>",
+  "similarityPercentage": <estimated similarity percentage 0-100>,
+  "originalityPercentage": <100 minus similarity>,
+  "plagiarismRisk": "<Low | Medium | High | Critical>",
   "flaggedSections": [
-    {
-      "text": "<exact sentence or phrase from the content>",
-      "reason": "<why this seems plagiarized or copied>",
-      "suggestion": "<how to rewrite this to make it original>"
-    }
+    { "text": "<exact copied/suspicious sentence from content>", "issue": "<why this is flagged>", "source": "<likely source type e.g. Wikipedia, common template, academic cliché>", "severity": "<High | Medium | Low>", "suggestion": "<how to rewrite this>" },
+    { "text": "<sentence>", "issue": "<issue>", "source": "<source>", "severity": "<severity>", "suggestion": "<fix>" },
+    { "text": "<sentence>", "issue": "<issue>", "source": "<source>", "severity": "<severity>", "suggestion": "<fix>" }
   ],
-  "originalSections": [
-    "<sentence or phrase that appears genuinely original>"
-  ],
-  "commonPhrases": [
-    "<common phrase found that reduces originality>"
-  ],
+  "duplicatePhrases": ["<repeated phrase 1 found internally>", "<phrase 2>"],
+  "commonTemplates": ["<template phrase 1 found>", "<template 2>"],
+  "citationNeeded": ["<statement that needs a citation>", "<statement 2>"],
+  "originalSections": ["<genuinely original part 1>", "<part 2>"],
   "insights": [
-    { "label": "Originality Score", "value": "<score>% — <badge>" },
+    { "label": "Originality Score", "value": "<score>%" },
+    { "label": "Similarity Score", "value": "<percentage>%" },
     { "label": "Plagiarism Risk", "value": "<risk level>" },
-    { "label": "Flagged Sections", "value": "<number> section(s) need attention" },
-    { "label": "Common Phrases", "value": "<number> generic phrases detected" },
-    { "label": "Original Content", "value": "<percentage>% appears genuinely original" },
-    { "label": "Recommendation", "value": "<main action to take>" }
+    { "label": "Flagged Sections", "value": "<number> sections need attention" },
+    { "label": "Common Templates Found", "value": "<number> template phrases detected" },
+    { "label": "Citations Needed", "value": "<number> statements need citation" },
+    { "label": "Internal Duplicates", "value": "<number> repeated phrases" },
+    { "label": "Important Note", "value": "Structural analysis only — not web-indexed like Turnitin" }
   ],
   "recommendations": [
-    "<specific recommendation to improve originality>",
+    "<specific rewriting instruction for flagged section>",
     "<recommendation 2>",
     "<recommendation 3>",
-    "<important note about limitations of this check vs Turnitin>"
+    "<recommendation 4>",
+    "Note: For academic submission, use Turnitin or iThenticate for full internet comparison"
   ]
 }`;
 
   try {
     const raw = await callGemini(prompt);
     const result = JSON.parse(raw);
-
-    return {
-      score: result.originalityScore || result.score || 70,
-      badge: result.badge || "Mostly Original",
-      color: (result.originalityScore >= 70) ? "green" : "warn",
-      icon: "📄",
-      name: "Plagiarism Checker",
-      plagiarismRisk: result.plagiarismRisk,
-      flaggedSections: result.flaggedSections || [],
-      originalSections: result.originalSections || [],
-      commonPhrases: result.commonPhrases || [],
-      insights: result.insights || [],
-      recommendations: result.recommendations || [],
-    };
+    return { score: result.score || 70, badge: result.badge || "Mostly Original", color: result.score >= 70 ? "green" : "warn", icon: "📄", name: "Plagiarism Checker", ...result };
   } catch (err) {
     console.error("Plagiarism Error:", err.message);
-    return errorResult("Plagiarism Checker", "📄", err.message);
+    return { score: 0, badge: "Error", color: "warn", icon: "📄", name: "Plagiarism Checker", insights: [{ label: "Error", value: err.message }], recommendations: ["Please check your GROQ_API_KEY and try again."] };
   }
-}
-
-function errorResult(name, icon, message) {
-  return {
-    score: 0, badge: "Error", color: "warn", icon, name,
-    insights: [{ label: "Error", value: message }],
-    recommendations: ["Please check your Gemini API key in the .env file and try again."],
-  };
 }
 
 module.exports = { analyzeSimilarity };

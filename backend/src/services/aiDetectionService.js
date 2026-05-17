@@ -1,100 +1,71 @@
-// ============================================================
-// AI CONTENT DETECTION SERVICE
-// Powered by Google Gemini
-// What it does:
-//   - Accurately detects whether text was written by AI or human
-//   - Highlights exactly which sentences/paragraphs are AI-written
-//   - Gives confidence score and detailed reasoning
-//   - Explains WHY it thinks it is AI or human
-// ============================================================
-
+// AI CONTENT DETECTION SERVICE — Professional Grade
 const { callGemini } = require("./geminiHelper");
 
 async function analyzeAIDetection(text) {
-  const prompt = `You are an expert AI content detection system trained to identify AI-generated text. Analyze the following content carefully.
+  const prompt = `You are an expert AI content detection system like GPTZero and Originality.ai. Analyze if the text was written by AI or human.
 
-CONTENT TO ANALYZE:
+CONTENT:
 """
-${text.substring(0, 3000)}
+${text.substring(0, 2500)}
 """
 
-Analyze this text for signs of AI generation. Look for:
-- Overly formal or uniform sentence structures
-- Repetitive use of transition words (Furthermore, Moreover, Additionally, In conclusion)
-- Lack of personal voice, opinions, or emotions
-- Too-perfect grammar and structure
-- Generic statements without specific details
-- Unnatural flow that feels templated
-- Absence of contractions, colloquialisms, or natural speech patterns
-- Suspiciously balanced paragraphs
+Analyze carefully for: uniform sentence structure, robotic transitions (Furthermore/Moreover/Additionally), lack of personal voice, perfect grammar, generic statements, no contractions, templated paragraphs, and unnatural flow.
 
-Respond ONLY with a valid JSON object. No text before or after:
+Respond ONLY with valid JSON:
 {
-  "aiProbability": <number 0-100, where 100 = definitely AI written>,
-  "score": <number 0-100, where higher = more human, so this is 100 minus aiProbability>,
-  "badge": "<one of: Definitely Human, Likely Human, Mixed Content, Likely AI, Definitely AI>",
+  "aiProbability": <number 0-100, where 100 = definitely AI>,
+  "score": <100 minus aiProbability>,
+  "badge": "<Definitely Human | Likely Human | Mixed Content | Likely AI | Definitely AI>",
   "verdict": "<one clear sentence verdict>",
-  "flaggedSentences": [
-    "<exact sentence from the text that seems AI-written>",
-    "<another flagged sentence>"
+  "mixedContent": <true if both human and AI sections detected>,
+  "sentenceAnalysis": [
+    { "sentence": "<exact sentence from text>", "type": "<AI | Human | Mixed>", "reason": "<why>" },
+    { "sentence": "<sentence>", "type": "<AI | Human | Mixed>", "reason": "<why>" },
+    { "sentence": "<sentence>", "type": "<AI | Human | Mixed>", "reason": "<why>" }
   ],
-  "humanSentences": [
-    "<sentence that seems naturally human-written>"
+  "aiIndicators": [
+    { "indicator": "<specific AI pattern found>", "severity": "<High | Medium | Low>", "example": "<example from text>" },
+    { "indicator": "<pattern>", "severity": "<High | Medium | Low>", "example": "<example>" },
+    { "indicator": "<pattern>", "severity": "<High | Medium | Low>", "example": "<example>" }
   ],
-  "detectionReasons": [
-    "<specific reason 1 why this seems AI or human>",
-    "<specific reason 2>",
-    "<specific reason 3>"
+  "humanIndicators": [
+    "<element that seems human-written>",
+    "<element 2>"
   ],
+  "writingPatterns": {
+    "sentenceVariety": "<High | Medium | Low>",
+    "vocabularyRichness": "<High | Medium | Low>",
+    "personalVoice": "<Present | Absent | Weak>",
+    "emotionalDepth": "<Present | Absent | Weak>",
+    "transitionWords": "<Natural | Robotic | Mixed>"
+  },
   "insights": [
     { "label": "AI Probability", "value": "<percentage>% — <badge>" },
-    { "label": "Verdict", "value": "<one line verdict>" },
-    { "label": "Writing Style", "value": "<assessment of writing style>" },
-    { "label": "Sentence Structure", "value": "<uniform/varied/mixed assessment>" },
-    { "label": "Personal Voice", "value": "<present/absent/weak>" },
-    { "label": "Flagged Sections", "value": "<number> sentence(s) flagged as AI-written" }
+    { "label": "Verdict", "value": "<verdict>" },
+    { "label": "Sentence Variety", "value": "<level>" },
+    { "label": "Personal Voice", "value": "<present/absent>" },
+    { "label": "AI Patterns Found", "value": "<number> patterns detected" },
+    { "label": "Most Suspicious", "value": "<most AI-like sentence snippet>" },
+    { "label": "Writing Style", "value": "<overall assessment>" },
+    { "label": "Mixed Content", "value": "<yes/no with brief explanation>" }
   ],
   "recommendations": [
-    "<specific advice to make this text less detectable as AI>",
-    "<specific advice 2>",
-    "<specific advice 3>",
-    "<specific advice 4>"
+    "<specific fix to reduce AI detection>",
+    "<fix 2>",
+    "<fix 3>",
+    "<fix 4>"
   ]
 }`;
 
   try {
     const raw = await callGemini(prompt);
     const result = JSON.parse(raw);
-
     const aiProb = result.aiProbability || 50;
-    const humanScore = 100 - aiProb;
-
-    return {
-      score: humanScore,
-      badge: result.badge || "Mixed Content",
-      color: humanScore >= 60 ? "green" : "warn",
-      icon: "🤖",
-      name: "AI Content Detection",
-      aiProbability: aiProb,
-      verdict: result.verdict,
-      flaggedSentences: result.flaggedSentences || [],
-      humanSentences: result.humanSentences || [],
-      detectionReasons: result.detectionReasons || [],
-      insights: result.insights || [],
-      recommendations: result.recommendations || [],
-    };
+    return { score: 100 - aiProb, badge: result.badge || "Mixed Content", color: (100 - aiProb) >= 60 ? "green" : "warn", icon: "🤖", name: "AI Content Detection", aiProbability: aiProb, ...result };
   } catch (err) {
     console.error("AI Detection Error:", err.message);
-    return errorResult("AI Content Detection", "🤖", err.message);
+    return { score: 0, badge: "Error", color: "warn", icon: "🤖", name: "AI Content Detection", insights: [{ label: "Error", value: err.message }], recommendations: ["Please check your GROQ_API_KEY and try again."] };
   }
-}
-
-function errorResult(name, icon, message) {
-  return {
-    score: 0, badge: "Error", color: "warn", icon, name,
-    insights: [{ label: "Error", value: message }],
-    recommendations: ["Please check your Gemini API key in the .env file and try again."],
-  };
 }
 
 module.exports = { analyzeAIDetection };

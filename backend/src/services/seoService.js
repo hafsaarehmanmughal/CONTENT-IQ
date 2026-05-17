@@ -1,90 +1,65 @@
-// ============================================================
-// SEO OPTIMIZATION SERVICE
-// Powered by Google Gemini
-// What it does:
-//   - Analyzes existing content for SEO weaknesses
-//   - Suggests high-ranked keywords relevant to the topic
-//   - Shows keyword density and volume estimates
-//   - Rewrites the content with SEO improvements applied
-//   - Gives actionable recommendations
-// ============================================================
-
+// SEO OPTIMIZATION SERVICE — Professional Grade
 const { callGemini } = require("./geminiHelper");
 
 async function analyzeSEO(text) {
-  const prompt = `You are a professional SEO expert. Analyze the following content and provide a complete SEO analysis.
+  const prompt = `You are a world-class SEO expert like SEMrush or Ahrefs. Analyze the following content and provide a comprehensive professional SEO analysis.
 
-CONTENT TO ANALYZE:
+CONTENT:
 """
-${text.substring(0, 3000)}
+${text.substring(0, 2500)}
 """
 
-Your task:
-1. Identify the main topic of this content
-2. Find SEO weaknesses in the current text
-3. Suggest 8-10 high-ranking keywords relevant to this topic that should be added
-4. Rewrite the content with those keywords naturally integrated (keep the same meaning but improve SEO)
-5. Give specific recommendations
-
-Respond ONLY with a valid JSON object. No text before or after. Exactly this structure:
+Respond ONLY with valid JSON. No text before or after:
 {
-  "score": <number 0-100 representing current SEO score>,
-  "badge": "<one of: Excellent, Good, Needs Work, Poor>",
-  "topic": "<detected main topic of the content>",
-  "currentKeywordDensity": "<e.g. '1.2% - too low'>",
-  "wordCount": <number of words in original>,
-  "improvedContent": "<the full rewritten content with SEO keywords naturally added>",
+  "score": <number 0-100>,
+  "badge": "<Excellent | Good | Needs Work | Poor>",
+  "topic": "<main topic detected>",
+  "searchIntent": "<Informational | Commercial | Transactional | Navigational>",
+  "wordCount": <number>,
+  "recommendedWordCount": "<e.g. 1500-2000 words>",
+  "keywordDensity": "<current primary keyword density>",
+  "missingKeywords": ["<keyword 1>", "<keyword 2>", "<keyword 3>", "<keyword 4>", "<keyword 5>"],
   "suggestedKeywords": [
-    { "keyword": "<keyword>", "estimatedVolume": "<e.g. High / Medium / Low>", "difficulty": "<Easy / Medium / Hard>", "relevance": "<why this keyword fits>" },
-    { "keyword": "<keyword>", "estimatedVolume": "<High / Medium / Low>", "difficulty": "<Easy / Medium / Hard>", "relevance": "<why>" },
-    { "keyword": "<keyword>", "estimatedVolume": "<High / Medium / Low>", "difficulty": "<Easy / Medium / Hard>", "relevance": "<why>" },
-    { "keyword": "<keyword>", "estimatedVolume": "<High / Medium / Low>", "difficulty": "<Easy / Medium / Hard>", "relevance": "<why>" },
-    { "keyword": "<keyword>", "estimatedVolume": "<High / Medium / Low>", "difficulty": "<Easy / Medium / Hard>", "relevance": "<why>" }
+    { "keyword": "<keyword>", "searchVolume": "<High | Medium | Low>", "difficulty": "<Easy | Medium | Hard>", "intent": "<search intent>", "priority": "<Must Add | Should Add | Optional>" },
+    { "keyword": "<keyword>", "searchVolume": "<High | Medium | Low>", "difficulty": "<Easy | Medium | Hard>", "intent": "<intent>", "priority": "<priority>" },
+    { "keyword": "<keyword>", "searchVolume": "<High | Medium | Low>", "difficulty": "<Easy | Medium | Hard>", "intent": "<intent>", "priority": "<priority>" },
+    { "keyword": "<keyword>", "searchVolume": "<High | Medium | Low>", "difficulty": "<Easy | Medium | Hard>", "intent": "<intent>", "priority": "<priority>" },
+    { "keyword": "<keyword>", "searchVolume": "<High | Medium | Low>", "difficulty": "<Easy | Medium | Hard>", "intent": "<intent>", "priority": "<priority>" }
   ],
+  "longTailKeywords": ["<phrase 1>", "<phrase 2>", "<phrase 3>", "<phrase 4>"],
+  "metaTitle": "<suggested SEO title under 60 characters>",
+  "metaDescription": "<suggested meta description under 160 characters>",
+  "headingStructure": "<assessment of heading usage>",
+  "contentGaps": ["<topic gap 1>", "<gap 2>", "<gap 3>"],
+  "onPageIssues": ["<issue 1>", "<issue 2>", "<issue 3>"],
+  "seoOptimizedVersion": "<complete rewritten content with SEO keywords naturally integrated and proper structure>",
   "insights": [
     { "label": "SEO Score", "value": "<score>/100" },
     { "label": "Main Topic", "value": "<topic>" },
-    { "label": "Word Count", "value": "<count> words (<good/needs improvement>)" },
-    { "label": "Keyword Density", "value": "<current density assessment>" },
-    { "label": "Top Suggested Keyword", "value": "<best keyword to add>" },
-    { "label": "Content Quality", "value": "<brief assessment>" }
+    { "label": "Search Intent", "value": "<intent>" },
+    { "label": "Word Count", "value": "<count> words (recommended: <recommended>)" },
+    { "label": "Keyword Density", "value": "<density>" },
+    { "label": "Content Gaps", "value": "<number> gaps detected" },
+    { "label": "Missing Keywords", "value": "<number> important keywords missing" },
+    { "label": "Meta Title", "value": "<suggested title>" }
   ],
   "recommendations": [
-    "<specific actionable SEO recommendation 1>",
-    "<specific actionable SEO recommendation 2>",
-    "<specific actionable SEO recommendation 3>",
-    "<specific actionable SEO recommendation 4>"
+    "<specific SEO action 1>",
+    "<specific SEO action 2>",
+    "<specific SEO action 3>",
+    "<specific SEO action 4>",
+    "<specific SEO action 5>"
   ]
 }`;
 
   try {
     const raw = await callGemini(prompt);
     const result = JSON.parse(raw);
-
-    return {
-      score: result.score || 50,
-      badge: result.badge || "Needs Work",
-      color: (result.score >= 70) ? "gold" : "warn",
-      icon: "📊",
-      name: "SEO Optimization",
-      topic: result.topic,
-      improvedContent: result.improvedContent,
-      suggestedKeywords: result.suggestedKeywords || [],
-      insights: result.insights || [],
-      recommendations: result.recommendations || [],
-    };
+    return { score: result.score || 50, badge: result.badge || "Needs Work", color: result.score >= 70 ? "gold" : "warn", icon: "📊", name: "SEO Optimization", ...result };
   } catch (err) {
-    console.error("SEO Service Error:", err.message);
-    return errorResult("SEO Optimization", "📊", err.message);
+    console.error("SEO Error:", err.message);
+    return { score: 0, badge: "Error", color: "warn", icon: "📊", name: "SEO Optimization", insights: [{ label: "Error", value: err.message }], recommendations: ["Please check your GROQ_API_KEY and try again."] };
   }
-}
-
-function errorResult(name, icon, message) {
-  return {
-    score: 0, badge: "Error", color: "warn", icon, name,
-    insights: [{ label: "Error", value: message }],
-    recommendations: ["Please check your Gemini API key in the .env file and try again."],
-  };
 }
 
 module.exports = { analyzeSEO };

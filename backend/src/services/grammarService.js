@@ -1,94 +1,71 @@
-// ============================================================
-// GRAMMAR & READABILITY SERVICE
-// Powered by Google Gemini
-// What it does:
-//   - Finds ALL grammar, spelling, punctuation errors
-//   - Returns the fully corrected version of the text
-//   - Shows exactly what was wrong and what was fixed
-//   - Improves readability and sentence structure
-//   - Gives a readability grade level
-// ============================================================
-
+// GRAMMAR & READABILITY SERVICE — Professional Grade
 const { callGemini } = require("./geminiHelper");
 
 async function analyzeGrammar(text) {
-  const prompt = `You are a professional grammar expert and editor. Analyze and correct the following text.
+  const prompt = `You are a professional grammar expert like Grammarly and ProWritingAid. Find and fix ALL grammar, spelling, punctuation errors and improve readability.
 
-CONTENT TO ANALYZE:
+CONTENT:
 """
-${text.substring(0, 3000)}
+${text.substring(0, 2500)}
 """
 
-Your tasks:
-1. Find ALL grammar mistakes (subject-verb agreement, tense errors, etc.)
-2. Find ALL spelling mistakes
-3. Find ALL punctuation errors
-4. Fix awkward or unclear sentences
-5. Improve overall readability
-6. Return the fully corrected version
+Be extremely thorough — find every single error. Also analyze readability, tone, and writing quality.
 
-Respond ONLY with a valid JSON object. No text before or after:
+Respond ONLY with valid JSON:
 {
-  "score": <number 0-100 grammar quality of ORIGINAL text>,
-  "badge": "<one of: Excellent, Good, Needs Work, Poor>",
-  "correctedText": "<the complete corrected version of the entire text with ALL errors fixed>",
-  "totalErrors": <total number of errors found>,
+  "score": <grammar quality score 0-100>,
+  "badge": "<Excellent | Good | Needs Work | Poor>",
+  "totalErrors": <total number of all errors found>,
   "grammarErrors": [
-    { "original": "<exact wrong text>", "corrected": "<corrected version>", "explanation": "<what was wrong>" },
-    { "original": "<wrong>", "corrected": "<fixed>", "explanation": "<why>" }
+    { "original": "<wrong text>", "corrected": "<fixed text>", "type": "<Subject-Verb Agreement | Tense Error | Article Error | Preposition Error | Other>", "explanation": "<clear explanation>" },
+    { "original": "<wrong>", "corrected": "<fixed>", "type": "<type>", "explanation": "<why>" }
   ],
   "spellingErrors": [
-    { "original": "<misspelled word>", "corrected": "<correct spelling>" }
+    { "original": "<misspelled>", "corrected": "<correct spelling>", "position": "<where in text>" }
   ],
-  "readabilityLevel": "<e.g. Grade 8, College Level, Easy, etc.>",
-  "readabilityScore": <Flesch reading ease score 0-100>,
+  "punctuationErrors": [
+    { "original": "<wrong punctuation>", "corrected": "<fixed>", "explanation": "<why>" }
+  ],
+  "styleIssues": [
+    { "issue": "<style problem>", "example": "<from text>", "suggestion": "<how to fix>" },
+    { "issue": "<issue>", "example": "<example>", "suggestion": "<fix>" }
+  ],
+  "passiveVoiceInstances": ["<passive voice sentence 1>", "<sentence 2>"],
+  "hardToReadSentences": ["<complex sentence 1>", "<sentence 2>"],
+  "repeatedWords": ["<repeated word 1>", "<word 2>"],
+  "toneAssessment": "<Formal | Informal | Academic | Conversational | Professional>",
+  "toneConsistency": "<Consistent | Inconsistent — explanation>",
+  "readabilityScore": <Flesch reading ease 0-100>,
+  "readabilityLevel": "<Very Easy | Easy | Standard | Difficult | Very Difficult>",
+  "gradeLevel": "<e.g. Grade 8 | College Level>",
+  "correctedText": "<the complete corrected version of the entire text with ALL errors fixed and readability improved>",
   "insights": [
     { "label": "Grammar Score", "value": "<score>/100" },
-    { "label": "Total Errors Found", "value": "<number> error(s) corrected" },
-    { "label": "Grammar Errors", "value": "<number> grammar mistake(s)" },
-    { "label": "Spelling Errors", "value": "<number> spelling mistake(s)" },
-    { "label": "Readability Level", "value": "<level>" },
-    { "label": "Overall Quality", "value": "<brief assessment>" }
+    { "label": "Total Errors Found", "value": "<number> errors corrected" },
+    { "label": "Grammar Errors", "value": "<number>" },
+    { "label": "Spelling Errors", "value": "<number>" },
+    { "label": "Punctuation Errors", "value": "<number>" },
+    { "label": "Readability Score", "value": "<score>/100 — <level>" },
+    { "label": "Grade Level", "value": "<grade>" },
+    { "label": "Tone", "value": "<tone> (<consistent/inconsistent>)" }
   ],
   "recommendations": [
-    "<specific grammar improvement tip>",
-    "<readability improvement tip>",
-    "<style improvement tip>",
-    "<general writing advice>"
+    "<specific grammar improvement>",
+    "<readability improvement>",
+    "<style improvement>",
+    "<vocabulary suggestion>",
+    "<tone improvement>"
   ]
 }`;
 
   try {
     const raw = await callGemini(prompt);
     const result = JSON.parse(raw);
-
-    return {
-      score: result.score || 70,
-      badge: result.badge || "Good",
-      color: (result.score >= 60) ? "gold" : "warn",
-      icon: "📝",
-      name: "Grammar & Readability",
-      correctedText: result.correctedText,
-      totalErrors: result.totalErrors || 0,
-      grammarErrors: result.grammarErrors || [],
-      spellingErrors: result.spellingErrors || [],
-      readabilityLevel: result.readabilityLevel,
-      readabilityScore: result.readabilityScore,
-      insights: result.insights || [],
-      recommendations: result.recommendations || [],
-    };
+    return { score: result.score || 70, badge: result.badge || "Good", color: result.score >= 60 ? "gold" : "warn", icon: "📝", name: "Grammar & Readability", ...result };
   } catch (err) {
     console.error("Grammar Error:", err.message);
-    return errorResult("Grammar & Readability", "📝", err.message);
+    return { score: 0, badge: "Error", color: "warn", icon: "📝", name: "Grammar & Readability", insights: [{ label: "Error", value: err.message }], recommendations: ["Please check your GROQ_API_KEY and try again."] };
   }
-}
-
-function errorResult(name, icon, message) {
-  return {
-    score: 0, badge: "Error", color: "warn", icon, name,
-    insights: [{ label: "Error", value: message }],
-    recommendations: ["Please check your Gemini API key in the .env file and try again."],
-  };
 }
 
 module.exports = { analyzeGrammar };
