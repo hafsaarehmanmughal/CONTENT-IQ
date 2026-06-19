@@ -1,5 +1,5 @@
 // AI CONTENT DETECTION SERVICE — Professional Grade
-const { callGemini } = require("./geminiHelper");
+const { callGroq } = require("./groqHelper");
 
 async function analyzeAIDetection(text) {
   const prompt = `You are an expert AI content detection system like GPTZero and Originality.ai. Analyze if the text was written by AI or human.
@@ -58,7 +58,7 @@ Respond ONLY with valid JSON:
 }`;
 
   try {
-    const raw = await callGemini(prompt);
+    const raw = await callGroq(prompt);
     const result = JSON.parse(raw);
     const aiProb = result.aiProbability || 50;
     return { score: 100 - aiProb, badge: result.badge || "Mixed Content", color: (100 - aiProb) >= 60 ? "green" : "warn", icon: "🤖", name: "AI Content Detection", aiProbability: aiProb, ...result };

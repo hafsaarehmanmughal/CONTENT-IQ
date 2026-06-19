@@ -1,5 +1,5 @@
 // PLAGIARISM CHECKER SERVICE — Professional Grade
-const { callGemini } = require("./geminiHelper");
+const { callGroq } = require("./groqHelper");
 
 async function analyzeSimilarity(text) {
   const prompt = `You are a professional plagiarism detection expert like Turnitin and Grammarly. Analyze the content for plagiarism, copied sentences, and originality issues.
@@ -47,7 +47,7 @@ Respond ONLY with valid JSON:
 }`;
 
   try {
-    const raw = await callGemini(prompt);
+    const raw = await callGroq(prompt);
     const result = JSON.parse(raw);
     return { score: result.score || 70, badge: result.badge || "Mostly Original", color: result.score >= 70 ? "green" : "warn", icon: "📄", name: "Plagiarism Checker", ...result };
   } catch (err) {

@@ -1,5 +1,5 @@
 // SEO OPTIMIZATION SERVICE — Professional Grade
-const { callGemini } = require("./geminiHelper");
+const { callGroq } = require("./groqHelper");
 
 async function analyzeSEO(text) {
   const prompt = `You are a world-class SEO expert like SEMrush or Ahrefs. Analyze the following content and provide a comprehensive professional SEO analysis.
@@ -53,7 +53,7 @@ Respond ONLY with valid JSON. No text before or after:
 }`;
 
   try {
-    const raw = await callGemini(prompt);
+    const raw = await callGroq(prompt);
     const result = JSON.parse(raw);
     return { score: result.score || 50, badge: result.badge || "Needs Work", color: result.score >= 70 ? "gold" : "warn", icon: "📊", name: "SEO Optimization", ...result };
   } catch (err) {

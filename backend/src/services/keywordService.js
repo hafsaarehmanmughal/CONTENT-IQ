@@ -1,5 +1,5 @@
 // KEYWORD ANALYSIS SERVICE — Professional Grade
-const { callGemini } = require("./geminiHelper");
+const { callGroq } = require("./groqHelper");
 
 async function analyzeKeywords(text) {
   const prompt = `You are a professional keyword research expert like Google Keyword Planner and SEMrush Keyword Magic Tool. Analyze the content and provide complete keyword intelligence.
@@ -63,7 +63,7 @@ Respond ONLY with valid JSON:
 }`;
 
   try {
-    const raw = await callGemini(prompt);
+    const raw = await callGroq(prompt);
     const result = JSON.parse(raw);
     return { score: result.score || 60, badge: result.badge || "Needs Optimization", color: "gold", icon: "🔑", name: "Keyword Analysis", ...result };
   } catch (err) {

@@ -1,5 +1,5 @@
 // FORMATTING ASSISTANCE SERVICE — Professional Grade
-const { callGemini } = require("./geminiHelper");
+const { callGroq } = require("./groqHelper");
 
 async function analyzeFormatting(text) {
   const prompt = `You are a professional document formatting expert like Microsoft Editor and Notion. Analyze and improve the formatting and structure of the following content.
@@ -67,7 +67,7 @@ Respond ONLY with valid JSON:
 }`;
 
   try {
-    const raw = await callGemini(prompt);
+    const raw = await callGroq(prompt);
     const result = JSON.parse(raw);
     return { score: result.score || 60, badge: result.badge || "Needs Work", color: result.score >= 70 ? "gold" : "warn", icon: "📐", name: "Formatting Assistance", ...result };
   } catch (err) {

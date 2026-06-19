@@ -1,5 +1,5 @@
 // GRAMMAR & READABILITY SERVICE — Professional Grade
-const { callGemini } = require("./geminiHelper");
+const { callGroq } = require("./groqHelper");
 
 async function analyzeGrammar(text) {
   const prompt = `You are a professional grammar expert like Grammarly and ProWritingAid. Find and fix ALL grammar, spelling, punctuation errors and improve readability.
@@ -59,7 +59,7 @@ Respond ONLY with valid JSON:
 }`;
 
   try {
-    const raw = await callGemini(prompt);
+    const raw = await callGroq(prompt);
     const result = JSON.parse(raw);
     return { score: result.score || 70, badge: result.badge || "Good", color: result.score >= 60 ? "gold" : "warn", icon: "📝", name: "Grammar & Readability", ...result };
   } catch (err) {

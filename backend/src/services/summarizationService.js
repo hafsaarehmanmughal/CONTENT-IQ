@@ -1,5 +1,5 @@
 // TEXT SUMMARIZATION SERVICE — Professional Grade
-const { callGemini } = require("./geminiHelper");
+const { callGroq } = require("./groqHelper");
 
 async function analyzeSummarization(text) {
   const wordCount = text.trim().split(/\s+/).length;
@@ -66,7 +66,7 @@ Respond ONLY with valid JSON:
 }`;
 
   try {
-    const raw = await callGemini(prompt);
+    const raw = await callGroq(prompt);
     const result = JSON.parse(raw);
     return { score: result.score || 75, badge: result.badge || "Good", color: "gold", icon: "📋", name: "Text Summarization", originalWordCount: wordCount, ...result };
   } catch (err) {

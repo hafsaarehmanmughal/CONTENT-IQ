@@ -1,15 +1,14 @@
 // ============================================================
-// AI API HELPER — Powered by Groq (Llama 3.3 70B)
+// GROQ API HELPER
+// Powered by Groq — Llama 3.3 70B Versatile Model
 // FREE — no credit card, no quota issues
-// Free tier: 14,400 requests/day
-// Sign up: https://console.groq.com
-// NOTE: File is named geminiHelper.js so all 6 services
-//       can import it without any changes
+// Free tier: 14,400 requests/day, 500,000 tokens/minute
+// Get your free key at: https://console.groq.com
 // ============================================================
 
 const https = require("https");
 
-async function callGemini(prompt) {
+async function callGroq(prompt) {
   const apiKey = process.env.GROQ_API_KEY;
 
   if (!apiKey || apiKey === "gsk_your_key_here") {
@@ -60,6 +59,7 @@ async function callGemini(prompt) {
             return reject(new Error("Empty response from Groq"));
           }
 
+          // Strip markdown code fences if model adds them
           const clean = content
             .replace(/```json\n?/g, "")
             .replace(/```\n?/g, "")
@@ -73,9 +73,9 @@ async function callGemini(prompt) {
     });
 
     req.on("error", reject);
-    req.setTimeout(30000, () => {
+    req.setTimeout(60000, () => {
       req.destroy();
-      reject(new Error("Groq request timed out after 30 seconds"));
+      reject(new Error("Groq request timed out after 60 seconds"));
     });
 
     req.write(postData);
@@ -83,4 +83,4 @@ async function callGemini(prompt) {
   });
 }
 
-module.exports = { callGemini };
+module.exports = { callGroq };

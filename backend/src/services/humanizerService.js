@@ -1,5 +1,5 @@
 // CONTENT HUMANIZER SERVICE — Professional Grade
-const { callGemini } = require("./geminiHelper");
+const { callGroq } = require("./groqHelper");
 
 async function analyzeHumanizer(text) {
   const prompt = `You are a professional content humanizer like Undetectable AI and QuillBot. Rewrite the content to sound completely natural and human-written.
@@ -60,7 +60,7 @@ Respond ONLY with valid JSON:
 }`;
 
   try {
-    const raw = await callGemini(prompt);
+    const raw = await callGroq(prompt);
     const result = JSON.parse(raw);
     return { score: result.score || 85, badge: result.badge || "Mostly Human", color: "gold", icon: "✨", name: "Content Humanizer", ...result };
   } catch (err) {
