@@ -284,36 +284,35 @@
     <div class="footer-copy">2026 ContentIQ</div>
   </footer>
   <script>
-    // Auth guard
-    const token = localStorage.getItem("contentIQToken");
-    if (!token) { localStorage.removeItem("contentIQToken"); localStorage.removeItem("contentIQUser"); window.location.href = "/login"; }
+    // ── AUTH GUARD ──────────────────────────────────────
+    var token = localStorage.getItem('contentIQToken');
+    if (!token) { window.location.href = '/login'; }
 
-    var stored = JSON.parse(localStorage.getItem("contentIQResults"));
+    var stored = JSON.parse(localStorage.getItem('contentIQResults') || 'null');
 
-    if (!stored || !stored.results || stored.results.length === 0) {
+    if (!stored || !stored.results || !stored.results.length) {
       document.getElementById('servicesLine').textContent = 'No results found. Please run a new analysis.';
     } else {
       var reports = stored.results;
 
       document.getElementById('servicesLine').textContent =
-        'Services run: ' + reports.map(function(r) { return r.name; }).join(', ');
+        'Services run: ' + reports.map(function(r){ return r.name; }).join(', ');
 
-      // Score chips
+      // ── SCORE CHIPS ───────────────────────────────────
       var scoreRow = document.getElementById('scoreRow');
       reports.forEach(function(r) {
-        var lower = (r.badge || '').toLowerCase();
-        var bc = (lower.includes('excellent') || lower.includes('original') || lower.includes('human') || lower.includes('low') || lower.includes('optimized') || lower.includes('good')) ? 'good' : 'warn';
+        var lower = (r.badge||'').toLowerCase();
+        var bc = (lower.includes('excellent')||lower.includes('original')||lower.includes('human')||lower.includes('low')||lower.includes('optimized')||lower.includes('good')) ? 'good' : 'warn';
         scoreRow.innerHTML +=
           '<div class="score-chip">' +
-            '<div class="score-value ' + r.color + '">' + r.score + '%</div>' +
+            '<div class="score-value '+r.color+'">' + r.score + '%</div>' +
             '<div class="score-name">' + r.name + '</div>' +
-            '<span class="score-badge ' + bc + '">' + r.badge + '</span>' +
+            '<span class="score-badge '+bc+'">' + r.badge + '</span>' +
           '</div>';
       });
 
-      // Build blocks
+      // ── REPORT BLOCKS ─────────────────────────────────
       var container = document.getElementById('reportContainer');
-
       reports.forEach(function(r, index) {
         var insights = r.insights || [];
         var recs = r.recommendations || [];
@@ -324,76 +323,9 @@
                  '</div><div class="insight-value">' + ins.value + '</div></div>';
         }).join('');
 
-        // ── EXTRA SECTIONS per service type ──────────────────
         var extraHTML = '';
 
-        // SUMMARIZATION — show summary and key points
-        if (r.summary) {
-          extraHTML += '<div class="recs-title" style="margin-top:20px;color:#c9a84c;">📋 Summary</div>' +
-            '<div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.2);padding:16px;margin-bottom:16px;font-size:14px;line-height:1.8;color:#f5f2eb;">' + escHtml(r.summary) + '</div>';
-          if (r.keyPoints && r.keyPoints.length > 0) {
-            extraHTML += '<div class="recs-title">Key Points</div>';
-            r.keyPoints.forEach(function(point) {
-              extraHTML += '<div class="rec-item">' + escHtml(point) + '</div>';
-            });
-          }
-        }
-
-        // SUMMARIZATION — show all summary types and key points
-        if (r.executiveSummary || r.summary) {
-          var sumText = r.executiveSummary || r.summary;
-          extraHTML += '<div class="recs-title" style="margin-top:20px;color:#c9a84c;">📋 Executive Summary</div>' +
-            '<div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.2);padding:16px;margin-bottom:12px;font-size:14px;line-height:1.8;color:#f5f2eb;">' + escHtml(sumText) + '</div>';
-          if (r.shortSummary) {
-            extraHTML += '<div class="recs-title">One-Line Summary</div>' +
-              '<div style="background:rgba(201,168,76,0.08);border-left:3px solid #c9a84c;padding:12px 16px;margin-bottom:12px;font-size:14px;color:#f5f2eb;">' + escHtml(r.shortSummary) + '</div>';
-          }
-          if (r.keyPoints && r.keyPoints.length > 0) {
-            extraHTML += '<div class="recs-title">Key Points</div>';
-            r.keyPoints.forEach(function(point) {
-              extraHTML += '<div class="rec-item">' + escHtml(point) + '</div>';
-            });
-          }
-          if (r.studyNotes && r.studyNotes.length > 0) {
-            extraHTML += '<div class="recs-title" style="margin-top:16px;">Study Notes</div>';
-            r.studyNotes.forEach(function(note) {
-              extraHTML += '<div class="rec-item">' + escHtml(note) + '</div>';
-            });
-          }
-          if (r.importantFacts && r.importantFacts.length > 0) {
-            extraHTML += '<div class="recs-title" style="margin-top:16px;">Important Facts</div>';
-            r.importantFacts.forEach(function(fact) {
-              extraHTML += '<div class="rec-item">' + escHtml(fact) + '</div>';
-            });
-          }
-        }
-
-        // FORMATTING — show formatted content versions
-        if (r.formattedContent) {
-          extraHTML += '<div class="recs-title" style="margin-top:20px;color:#c9a84c;">📐 Formatted Version</div>' +
-            '<div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.2);padding:16px;margin-bottom:12px;font-size:13px;line-height:1.8;color:#f5f2eb;white-space:pre-wrap;">' + escHtml(r.formattedContent) + '</div>';
-          if (r.academicVersion) {
-            extraHTML += '<div class="recs-title">Academic Version</div>' +
-              '<div style="background:rgba(126,200,126,0.05);border:1px solid rgba(126,200,126,0.2);padding:16px;margin-bottom:12px;font-size:13px;line-height:1.8;color:#f5f2eb;white-space:pre-wrap;">' + escHtml(r.academicVersion) + '</div>';
-          }
-          if (r.suggestedHeadings && r.suggestedHeadings.length > 0) {
-            extraHTML += '<div class="recs-title" style="margin-top:16px;">Suggested Heading Structure</div>';
-            r.suggestedHeadings.forEach(function(h) {
-              extraHTML += '<div class="rec-item"><span style="color:#c9a84c;font-weight:500;">' + escHtml(h.level) + ':</span> ' + escHtml(h.text) + '</div>';
-            });
-          }
-          if (r.formattingIssues && r.formattingIssues.length > 0) {
-            extraHTML += '<div class="recs-title" style="margin-top:16px;color:#e05c5c;">⚠ Formatting Issues</div>';
-            r.formattingIssues.forEach(function(issue) {
-              extraHTML += '<div style="background:rgba(224,92,92,0.07);border-left:3px solid rgba(224,92,92,0.5);padding:10px 14px;margin-bottom:8px;font-size:13px;">' +
-                '<div style="color:#e05c5c;">' + escHtml(issue.issue||'') + '</div>' +
-                '<div style="color:#7ec87e;font-size:12px;margin-top:4px;">Fix: ' + escHtml(issue.fix||'') + '</div>' +
-              '</div>';
-            });
-          }
-        }
-
-        // GRAMMAR — show corrected text + error list
+        // GRAMMAR
         if (r.correctedText) {
           extraHTML += '<div class="recs-title" style="margin-top:20px;color:#7ec87e;">✓ Corrected Version</div>' +
             '<div style="background:rgba(126,200,126,0.05);border:1px solid rgba(126,200,126,0.2);padding:16px;margin-bottom:16px;font-size:13px;line-height:1.8;color:#f5f2eb;white-space:pre-wrap;">' + escHtml(r.correctedText) + '</div>';
@@ -409,7 +341,7 @@
           }
         }
 
-        // HUMANIZER — show humanized text + techniques
+        // HUMANIZER
         if (r.humanizedText) {
           extraHTML += '<div class="recs-title" style="margin-top:20px;color:#c9a84c;">✨ Humanized Version</div>' +
             '<div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.2);padding:16px;margin-bottom:16px;font-size:13px;line-height:1.8;color:#f5f2eb;white-space:pre-wrap;">' + escHtml(r.humanizedText) + '</div>';
@@ -421,30 +353,30 @@
           }
         }
 
-        // SEO — show improved content + keyword table
-        if (r.improvedContent) {
+        // SEO
+        if (r.seoOptimizedVersion) {
           extraHTML += '<div class="recs-title" style="margin-top:20px;color:#c9a84c;">📊 SEO-Optimized Version</div>' +
-            '<div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.2);padding:16px;margin-bottom:16px;font-size:13px;line-height:1.8;color:#f5f2eb;white-space:pre-wrap;">' + escHtml(r.improvedContent) + '</div>';
+            '<div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.2);padding:16px;margin-bottom:16px;font-size:13px;line-height:1.8;color:#f5f2eb;white-space:pre-wrap;">' + escHtml(r.seoOptimizedVersion) + '</div>';
         }
         if (r.suggestedKeywords && r.suggestedKeywords.length > 0 && r.name === 'SEO Optimization') {
           extraHTML += '<div class="recs-title">Suggested Keywords to Add</div>';
           r.suggestedKeywords.forEach(function(k) {
             extraHTML += '<div class="rec-item" style="flex-direction:column;gap:3px;">' +
               '<span style="color:#c9a84c;font-weight:500;">' + escHtml(k.keyword) + '</span>' +
-              '<span style="color:#6b6860;font-size:12px;">Volume: ' + escHtml(k.estimatedVolume||'') + ' | Difficulty: ' + escHtml(k.difficulty||'') + '</span>' +
-              '<span style="color:#6b6860;font-size:12px;">' + escHtml(k.relevance||'') + '</span>' +
+              '<span style="color:#6b6860;font-size:12px;">Volume: ' + escHtml(k.searchVolume||'') + ' | Difficulty: ' + escHtml(k.difficulty||'') + ' | Priority: ' + escHtml(k.priority||'') + '</span>' +
+              '<span style="color:#6b6860;font-size:12px;">' + escHtml(k.intent||'') + '</span>' +
             '</div>';
           });
         }
 
-        // KEYWORD ANALYSIS — show keyword tables
+        // KEYWORD ANALYSIS
         if (r.name === 'Keyword Analysis') {
           if (r.existingKeywords && r.existingKeywords.length > 0) {
             extraHTML += '<div class="recs-title" style="margin-top:20px;">Keywords Found in Your Text</div>';
             r.existingKeywords.forEach(function(k) {
               extraHTML += '<div class="rec-item" style="justify-content:space-between;">' +
                 '<span style="color:#f5f2eb;">"' + escHtml(k.keyword) + '"</span>' +
-                '<span style="color:#6b6860;font-size:12px;">' + k.frequency + 'x · ' + escHtml(k.density||'') + ' · ' + escHtml(k.assessment||'') + '</span>' +
+                '<span style="color:#6b6860;font-size:12px;">' + k.frequency + 'x · ' + escHtml(k.density||'') + '% · ' + escHtml(k.assessment||'') + '</span>' +
               '</div>';
             });
           }
@@ -453,7 +385,7 @@
             r.suggestedKeywords.forEach(function(k) {
               extraHTML += '<div class="rec-item" style="flex-direction:column;gap:3px;">' +
                 '<span style="color:#c9a84c;font-weight:500;">' + escHtml(k.keyword) + '</span>' +
-                '<span style="color:#6b6860;font-size:12px;">Volume: ' + escHtml(k.searchVolume||'') + ' | Difficulty: ' + escHtml(k.difficulty||'') + ' | Intent: ' + escHtml(k.intent||'') + '</span>' +
+                '<span style="color:#6b6860;font-size:12px;">Volume: ' + escHtml(k.searchVolume||'') + ' | Difficulty: ' + escHtml(k.difficulty||'') + ' | CPC: ' + escHtml(k.cpc||'') + '</span>' +
                 '<span style="color:#6b6860;font-size:12px;">How to use: ' + escHtml(k.howToUse||'') + '</span>' +
               '</div>';
             });
@@ -461,58 +393,95 @@
           if (r.longTailKeywords && r.longTailKeywords.length > 0) {
             extraHTML += '<div class="recs-title" style="margin-top:16px;">Long-Tail Keyword Opportunities</div>';
             r.longTailKeywords.forEach(function(k) {
-              var kText = (typeof k === 'object') ? (k.phrase || k.keyword || JSON.stringify(k)) : k;
+              var kText = (typeof k === 'object') ? (k.phrase || k.keyword || '') : k;
               extraHTML += '<div class="rec-item">' + escHtml(kText) + '</div>';
+            });
+          }
+          if (r.questionKeywords && r.questionKeywords.length > 0) {
+            extraHTML += '<div class="recs-title" style="margin-top:16px;">Question Keywords to Target</div>';
+            r.questionKeywords.forEach(function(k) {
+              extraHTML += '<div class="rec-item">' + escHtml(k) + '</div>';
             });
           }
         }
 
-        // AI DETECTION — show sentence analysis and detection breakdown
-        if (r.sentenceAnalysis && r.sentenceAnalysis.length > 0) {
-          extraHTML += '<div class="recs-title" style="margin-top:20px;">Sentence-Level Analysis</div>';
-          r.sentenceAnalysis.forEach(function(s) {
-            var color = s.verdict === 'AI' ? '#e05c5c' : s.verdict === 'Human' ? '#7ec87e' : '#c9a84c';
-            extraHTML += '<div style="border:1px solid rgba(255,255,255,0.08);padding:10px 14px;margin-bottom:8px;font-size:13px;">' +
-              '<div style="color:' + color + ';font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">' + escHtml(s.verdict||'') + '</div>' +
-              '<div style="color:#f5f2eb;margin-bottom:4px;">"' + escHtml(s.sentence||'') + '"</div>' +
-              '<div style="color:#6b6860;font-size:12px;">' + escHtml(s.reason||'') + '</div>' +
-            '</div>';
-          });
-        }
-        if (r.aiIndicators && r.aiIndicators.length > 0) {
-          extraHTML += '<div class="recs-title" style="margin-top:16px;color:#e05c5c;">AI Indicators Found</div>';
-          r.aiIndicators.forEach(function(ind) {
-            extraHTML += '<div class="rec-item" style="color:#e05c5c;">' + escHtml(ind) + '</div>';
-          });
-        }
-        if (r.humanIndicators && r.humanIndicators.length > 0) {
-          extraHTML += '<div class="recs-title" style="margin-top:16px;color:#7ec87e;">Human Indicators Found</div>';
-          r.humanIndicators.forEach(function(ind) {
-            extraHTML += '<div class="rec-item" style="color:#7ec87e;">' + escHtml(ind) + '</div>';
-          });
-        }
-        if (r.flaggedSentences && r.flaggedSentences.length > 0 && !r.sentenceAnalysis) {
-          extraHTML += '<div class="recs-title" style="margin-top:20px;color:#e05c5c;">⚠ AI-Written Sentences</div>';
+        // AI DETECTION
+        if (r.flaggedSentences && r.flaggedSentences.length > 0 && r.name === 'AI Content Detection') {
+          extraHTML += '<div class="recs-title" style="margin-top:20px;color:#e05c5c;">⚠ AI-Written Sentences Detected</div>';
           r.flaggedSentences.forEach(function(s) {
-            extraHTML += '<div style="background:rgba(224,92,92,0.07);border-left:3px solid rgba(224,92,92,0.5);padding:10px 14px;margin-bottom:8px;font-size:13px;color:#f5f2eb;">' + escHtml(s) + '</div>';
+            extraHTML += '<div style="background:rgba(224,92,92,0.07);border-left:3px solid rgba(224,92,92,0.5);padding:10px 14px;margin-bottom:8px;font-size:13px;color:#f5f2eb;line-height:1.7;">' + escHtml(s) + '</div>';
           });
+          if (r.detectionReasons && r.detectionReasons.length > 0) {
+            extraHTML += '<div class="recs-title" style="margin-top:16px;">Why This Was Detected</div>';
+            r.detectionReasons.forEach(function(reason) {
+              extraHTML += '<div class="rec-item">' + escHtml(reason) + '</div>';
+            });
+          }
         }
 
-        // PLAGIARISM — show flagged sections with suggestions
+        // PLAGIARISM
         if (r.flaggedSections && r.flaggedSections.length > 0 && r.name === 'Plagiarism Checker') {
           extraHTML += '<div class="recs-title" style="margin-top:20px;color:#e05c5c;">⚠ Flagged Sections</div>';
           r.flaggedSections.forEach(function(s) {
             extraHTML += '<div style="background:rgba(224,92,92,0.07);border:1px solid rgba(224,92,92,0.2);padding:12px 16px;margin-bottom:10px;font-size:13px;line-height:1.7;">' +
               '<div style="color:#e05c5c;margin-bottom:6px;">"' + escHtml(s.text||'') + '"</div>' +
               '<div style="color:#6b6860;font-size:12px;">Reason: ' + escHtml(s.reason||'') + '</div>' +
+              '<div style="color:#6b6860;font-size:12px;">Source: ' + escHtml(s.source||'') + ' | Severity: ' + escHtml(s.severity||'') + '</div>' +
               '<div style="color:#7ec87e;font-size:12px;margin-top:4px;">Suggestion: ' + escHtml(s.suggestion||'') + '</div>' +
             '</div>';
           });
         }
 
+        // SUMMARIZATION
+        if (r.name === 'Text Summarization') {
+          if (r.executiveSummary) {
+            extraHTML += '<div class="recs-title" style="margin-top:20px;color:#c9a84c;">📋 Executive Summary</div>' +
+              '<div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.2);padding:16px;margin-bottom:12px;font-size:14px;line-height:1.8;color:#f5f2eb;">' + escHtml(r.executiveSummary) + '</div>';
+          }
+          if (r.shortSummary) {
+            extraHTML += '<div class="recs-title">One-Line Summary</div>' +
+              '<div style="background:rgba(126,200,126,0.05);border-left:3px solid #7ec87e;padding:14px;margin-bottom:12px;font-size:14px;line-height:1.8;color:#f5f2eb;">' + escHtml(r.shortSummary) + '</div>';
+          }
+          if (r.bulletSummary && r.bulletSummary.length > 0) {
+            extraHTML += '<div class="recs-title">Key Points</div>';
+            r.bulletSummary.forEach(function(p) {
+              extraHTML += '<div class="rec-item">' + escHtml(p) + '</div>';
+            });
+          }
+          if (r.studyNotes && r.studyNotes.length > 0) {
+            extraHTML += '<div class="recs-title" style="margin-top:12px;">Study Notes</div>';
+            r.studyNotes.forEach(function(n) {
+              extraHTML += '<div class="rec-item">' + escHtml(n) + '</div>';
+            });
+          }
+        }
+
+        // FORMATTING
+        if (r.name === 'Formatting Assistance') {
+          if (r.formattedVersion) {
+            extraHTML += '<div class="recs-title" style="margin-top:20px;color:#c9a84c;">📐 Formatted Version</div>' +
+              '<div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.2);padding:16px;margin-bottom:12px;font-size:13px;line-height:1.8;color:#f5f2eb;white-space:pre-wrap;">' + escHtml(r.formattedVersion) + '</div>';
+          }
+          if (r.tableOfContents && r.tableOfContents.length > 0) {
+            extraHTML += '<div class="recs-title">Suggested Table of Contents</div>';
+            r.tableOfContents.forEach(function(s, i) {
+              extraHTML += '<div class="rec-item">' + (i+1) + '. ' + escHtml(s) + '</div>';
+            });
+          }
+          if (r.formattingIssues && r.formattingIssues.length > 0) {
+            extraHTML += '<div class="recs-title" style="margin-top:12px;color:#e05c5c;">⚠ Formatting Issues Found</div>';
+            r.formattingIssues.forEach(function(issue) {
+              extraHTML += '<div class="rec-item" style="flex-direction:column;gap:3px;">' +
+                '<span style="color:#f5f2eb;font-weight:500;">' + escHtml(issue.issue||'') + '</span>' +
+                '<span style="color:#6b6860;font-size:12px;">Severity: ' + escHtml(issue.severity||'') + ' — Fix: ' + escHtml(issue.fix||issue.suggestion||'') + '</span>' +
+              '</div>';
+            });
+          }
+        }
+
         var recsHTML = recs.length > 0
           ? '<div class="recs-title" style="margin-top:16px;">Recommendations</div>' +
-            recs.map(function(rec) { return '<div class="rec-item">' + escHtml(rec) + '</div>'; }).join('')
+            recs.map(function(rec){ return '<div class="rec-item">' + escHtml(rec) + '</div>'; }).join('')
           : '';
 
         var block = document.createElement('div');
@@ -540,11 +509,7 @@
 
     function escHtml(str) {
       if (!str) return '';
-      return String(str)
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;');
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
     function toggleBlock(header) {
@@ -557,184 +522,174 @@
         bar.style.width = bar.getAttribute('data-width') + '%';
       });
     }, 200);
-    // ── PDF DOWNLOAD ──────────────────────────────────────────
-    function downloadPDF() {
-      if (!stored || !stored.results || stored.results.length === 0) {
-        alert("No results to download.");
-        return;
-      }
 
+    // ── PDF DOWNLOAD ──────────────────────────────────────
+    function downloadPDF() {
+      if (!stored || !stored.results || !stored.results.length) {
+        alert('No results to download.'); return;
+      }
       var reports = stored.results;
       var now = new Date();
-      var dateStr = now.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-      var timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+      var dateStr = now.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+      var timeStr = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
 
-      // Build full HTML for the PDF
-      var html = `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>ContentIQ Analysis Report</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff; color: #1a1a1a; font-size: 13px; line-height: 1.6; }
-  .header { background: #0a0a0f; color: #c9a84c; padding: 30px 40px; }
-  .header h1 { font-size: 28px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 4px; }
-  .header .sub { font-size: 12px; color: #888; letter-spacing: 1px; }
-  .meta { background: #f8f8f8; padding: 16px 40px; border-bottom: 2px solid #e0e0e0; display: flex; justify-content: space-between; font-size: 12px; color: #555; }
-  .scores-row { display: flex; flex-wrap: wrap; gap: 0; border-bottom: 2px solid #e0e0e0; }
-  .score-chip { flex: 1; min-width: 120px; padding: 20px 16px; text-align: center; border-right: 1px solid #e0e0e0; background: #fff; }
-  .score-chip:last-child { border-right: none; }
-  .score-num { font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
-  .score-num.gold { color: #c9a84c; }
-  .score-num.green { color: #2e9e4f; }
-  .score-num.warn { color: #e05c5c; }
-  .score-name { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #666; }
-  .score-badge { font-size: 10px; padding: 2px 8px; border-radius: 3px; margin-top: 5px; display: inline-block; background: #f0f0f0; color: #555; }
-  .service-block { margin: 0; border-bottom: 2px solid #e8e8e8; page-break-inside: avoid; }
-  .service-header { padding: 18px 40px; background: #f5f5f5; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; justify-content: space-between; }
-  .service-title { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-  .service-score { font-size: 22px; font-weight: 700; }
-  .service-score.gold { color: #c9a84c; }
-  .service-score.green { color: #2e9e4f; }
-  .service-score.warn { color: #e05c5c; }
-  .service-body { padding: 20px 40px; }
-  .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #e0e0e0; border: 1px solid #e0e0e0; margin-bottom: 20px; }
-  .insight-cell { background: #fff; padding: 10px 14px; }
-  .insight-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 3px; }
-  .insight-value { font-size: 13px; color: #1a1a1a; }
-  .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #c9a84c; font-weight: 600; margin: 18px 0 10px; border-bottom: 1px solid #f0e8d0; padding-bottom: 5px; }
-  .content-box { background: #fafafa; border: 1px solid #e0e0e0; border-left: 3px solid #c9a84c; padding: 14px 16px; font-size: 13px; line-height: 1.8; white-space: pre-wrap; word-wrap: break-word; margin-bottom: 16px; }
-  .content-box.green-border { border-left-color: #2e9e4f; }
-  .content-box.red-border { border-left-color: #e05c5c; background: #fff8f8; }
-  .rec-item { padding: 7px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; color: #333; display: flex; gap: 8px; }
-  .rec-item::before { content: "→"; color: #c9a84c; flex-shrink: 0; }
-  .rec-item:last-child { border-bottom: none; }
-  .error-item { margin-bottom: 10px; padding: 10px; background: #fff8f8; border: 1px solid #ffd0d0; font-size: 12px; }
-  .flagged-item { margin-bottom: 10px; padding: 10px; background: #fff8f8; border-left: 3px solid #e05c5c; font-size: 12px; }
-  .keyword-item { margin-bottom: 10px; padding: 10px; background: #f8f8f8; border: 1px solid #e8e8e8; font-size: 12px; }
-  .keyword-name { font-weight: 600; color: #c9a84c; font-size: 13px; }
-  .footer { background: #0a0a0f; color: #666; padding: 16px 40px; font-size: 11px; display: flex; justify-content: space-between; margin-top: 20px; }
-  @media print {
-    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .service-block { page-break-inside: avoid; }
-  }
-</style>
-</head>
-<body>
+      var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ContentIQ Analysis Report</title><style>' +
+        '* { margin:0; padding:0; box-sizing:border-box; }' +
+        'body { font-family: Arial,sans-serif; background:#fff; color:#1a1a1a; font-size:13px; line-height:1.6; }' +
+        '.header { background:#0a0a0f; color:#c9a84c; padding:30px 40px; }' +
+        '.header h1 { font-size:28px; letter-spacing:3px; text-transform:uppercase; margin-bottom:4px; }' +
+        '.header .sub { font-size:12px; color:#888; }' +
+        '.meta { background:#f8f8f8; padding:16px 40px; border-bottom:2px solid #e0e0e0; display:flex; justify-content:space-between; font-size:12px; color:#555; }' +
+        '.scores-row { display:flex; flex-wrap:wrap; border-bottom:2px solid #e0e0e0; }' +
+        '.score-chip { flex:1; min-width:120px; padding:20px 16px; text-align:center; border-right:1px solid #e0e0e0; }' +
+        '.score-num { font-size:30px; font-weight:700; line-height:1; margin-bottom:4px; }' +
+        '.score-num.gold { color:#c9a84c; } .score-num.green { color:#2e9e4f; } .score-num.warn { color:#e05c5c; }' +
+        '.score-name { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:#666; }' +
+        '.score-badge { font-size:10px; padding:2px 8px; background:#f0f0f0; color:#555; display:inline-block; margin-top:5px; }' +
+        '.service-block { border-bottom:2px solid #e8e8e8; page-break-inside:avoid; }' +
+        '.service-header { padding:18px 40px; background:#f5f5f5; border-bottom:1px solid #e0e0e0; display:flex; align-items:center; justify-content:space-between; }' +
+        '.service-title { font-size:16px; font-weight:600; }' +
+        '.service-score { font-size:22px; font-weight:700; }' +
+        '.service-score.gold { color:#c9a84c; } .service-score.green { color:#2e9e4f; } .service-score.warn { color:#e05c5c; }' +
+        '.service-body { padding:20px 40px; }' +
+        '.insights-grid { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:#e0e0e0; border:1px solid #e0e0e0; margin-bottom:20px; }' +
+        '.insight-cell { background:#fff; padding:10px 14px; }' +
+        '.insight-label { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:#888; margin-bottom:3px; }' +
+        '.insight-value { font-size:13px; }' +
+        '.section-title { font-size:11px; text-transform:uppercase; letter-spacing:2px; color:#c9a84c; font-weight:600; margin:18px 0 10px; border-bottom:1px solid #f0e8d0; padding-bottom:5px; }' +
+        '.content-box { background:#fafafa; border:1px solid #e0e0e0; border-left:3px solid #c9a84c; padding:14px 16px; font-size:13px; line-height:1.8; white-space:pre-wrap; word-wrap:break-word; margin-bottom:16px; }' +
+        '.content-box.green-border { border-left-color:#2e9e4f; }' +
+        '.rec-item { padding:7px 0; border-bottom:1px solid #f0f0f0; font-size:13px; color:#333; display:flex; gap:8px; }' +
+        '.rec-item::before { content:"→"; color:#c9a84c; flex-shrink:0; }' +
+        '.error-item { margin-bottom:10px; padding:10px; background:#fff8f8; border:1px solid #ffd0d0; font-size:12px; }' +
+        '.flagged-item { margin-bottom:10px; padding:10px; background:#fff8f8; border-left:3px solid #e05c5c; font-size:12px; }' +
+        '.keyword-item { margin-bottom:10px; padding:10px; background:#f8f8f8; border:1px solid #e8e8e8; font-size:12px; }' +
+        '.keyword-name { font-weight:600; color:#c9a84c; font-size:13px; }' +
+        '.footer { background:#0a0a0f; color:#666; padding:16px 40px; font-size:11px; display:flex; justify-content:space-between; margin-top:20px; }' +
+        '@media print { body { -webkit-print-color-adjust:exact; print-color-adjust:exact; } .service-block { page-break-inside:avoid; } }' +
+      '</style></head><body>';
 
-<div class="header">
-  <h1>ContentIQ</h1>
-  <div class="sub">Content Intelligence Analysis Report</div>
-</div>
-
-<div class="meta">
-  <span>Generated: ${dateStr} at ${timeStr}</span>
-  <span>Services Analyzed: ${reports.length}</span>
-  <span>ContentIQ Platform</span>
-</div>
-
-<div class="scores-row">`;
+      html += '<div class="header"><h1>ContentIQ</h1><div class="sub">Content Intelligence Analysis Report</div></div>';
+      html += '<div class="meta"><span>Generated: ' + dateStr + ' at ' + timeStr + '</span><span>Services Analyzed: ' + reports.length + '</span><span>ContentIQ Platform</span></div>';
 
       // Score chips
+      html += '<div class="scores-row">';
       reports.forEach(function(r) {
-        html += `<div class="score-chip">
-  <div class="score-num ${r.color}">${r.score}%</div>
-  <div class="score-name">${r.name}</div>
-  <div class="score-badge">${r.badge}</div>
-</div>`;
+        html += '<div class="score-chip"><div class="score-num ' + r.color + '">' + r.score + '%</div><div class="score-name">' + r.name + '</div><div class="score-badge">' + r.badge + '</div></div>';
       });
+      html += '</div>';
 
-      html += `</div>`;
-
-      // Each service block
+      // Service blocks
       reports.forEach(function(r) {
-        html += `<div class="service-block">
-<div class="service-header">
-  <div class="service-title">${r.icon || ''} ${r.name}</div>
-  <div class="service-score ${r.color}">${r.score}% — ${r.badge}</div>
-</div>
-<div class="service-body">`;
+        html += '<div class="service-block"><div class="service-header"><div class="service-title">' + (r.icon||'') + ' ' + r.name + '</div><div class="service-score ' + r.color + '">' + r.score + '% — ' + r.badge + '</div></div><div class="service-body">';
 
-        // Insights grid
-        if (r.insights && r.insights.length > 0) {
-          html += `<div class="insights-grid">`;
+        // Insights
+        if (r.insights && r.insights.length) {
+          html += '<div class="insights-grid">';
           r.insights.forEach(function(ins) {
-            html += `<div class="insight-cell"><div class="insight-label">${ins.label}</div><div class="insight-value">${ins.value}</div></div>`;
+            html += '<div class="insight-cell"><div class="insight-label">' + escPdf(ins.label) + '</div><div class="insight-value">' + escPdf(ins.value) + '</div></div>';
           });
-          html += `</div>`;
+          html += '</div>';
         }
 
         // Grammar corrected text
         if (r.correctedText) {
-          html += `<div class="section-title">✓ Corrected Version</div>
-<div class="content-box green-border">${escPdf(r.correctedText)}</div>`;
-          if (r.grammarErrors && r.grammarErrors.length > 0) {
-            html += `<div class="section-title">Errors Found & Fixed (${r.grammarErrors.length})</div>`;
+          html += '<div class="section-title">✓ Corrected Version</div><div class="content-box green-border">' + escPdf(r.correctedText) + '</div>';
+          if (r.grammarErrors && r.grammarErrors.length) {
+            html += '<div class="section-title">Errors Found & Fixed (' + r.grammarErrors.length + ')</div>';
             r.grammarErrors.forEach(function(e) {
-              html += `<div class="error-item">
-  <div style="color:#e05c5c;">✗ Original: "${escPdf(e.original)}"</div>
-  <div style="color:#2e9e4f;">✓ Fixed: "${escPdf(e.corrected)}"</div>
-  <div style="color:#666;">${escPdf(e.explanation)}</div>
-</div>`;
+              html += '<div class="error-item"><div style="color:#e05c5c;">✗ "' + escPdf(e.original) + '"</div><div style="color:#2e7d32;">✓ "' + escPdf(e.corrected) + '"</div><div style="color:#666;">' + escPdf(e.explanation) + '</div></div>';
             });
           }
         }
 
-        // Humanized text
+        // Humanizer
         if (r.humanizedText) {
-          html += `<div class="section-title">✨ Humanized Version</div>
-<div class="content-box">${escPdf(r.humanizedText)}</div>`;
-          if (r.techniquesUsed && r.techniquesUsed.length > 0) {
-            html += `<div class="section-title">Techniques Used</div>`;
-            r.techniquesUsed.forEach(function(t) {
-              html += `<div class="rec-item">${escPdf(t)}</div>`;
-            });
+          html += '<div class="section-title">✨ Humanized Version</div><div class="content-box">' + escPdf(r.humanizedText) + '</div>';
+          if (r.techniquesUsed && r.techniquesUsed.length) {
+            html += '<div class="section-title">Techniques Used</div>';
+            r.techniquesUsed.forEach(function(t) { html += '<div class="rec-item">' + escPdf(t) + '</div>'; });
           }
         }
 
-        // SEO improved content
-        if (r.improvedContent) {
-          html += `<div class="section-title">📊 SEO-Optimized Version</div>
-<div class="content-box">${escPdf(r.improvedContent)}</div>`;
+        // SEO
+        if (r.seoOptimizedVersion) {
+          html += '<div class="section-title">📊 SEO-Optimized Version</div><div class="content-box">' + escPdf(r.seoOptimizedVersion) + '</div>';
         }
-        if (r.suggestedKeywords && r.suggestedKeywords.length > 0 && r.name === 'SEO Optimization') {
-          html += `<div class="section-title">Suggested Keywords to Add</div>`;
+        if (r.suggestedKeywords && r.suggestedKeywords.length && r.name === 'SEO Optimization') {
+          html += '<div class="section-title">Suggested Keywords to Add</div>';
           r.suggestedKeywords.forEach(function(k) {
-            html += `<div class="keyword-item">
-  <div class="keyword-name">${escPdf(k.keyword)}</div>
-  <div>Volume: ${escPdf(k.estimatedVolume||'')} | Difficulty: ${escPdf(k.difficulty||'')}</div>
-  <div style="color:#666;">${escPdf(k.relevance||'')}</div>
-</div>`;
+            html += '<div class="keyword-item"><div class="keyword-name">' + escPdf(k.keyword) + '</div><div>Volume: ' + escPdf(k.searchVolume||'') + ' | Difficulty: ' + escPdf(k.difficulty||'') + ' | Priority: ' + escPdf(k.priority||'') + '</div><div style="color:#666;">' + escPdf(k.intent||'') + '</div></div>';
           });
         }
 
-        // Summarization in PDF
+        // Keywords
+        if (r.name === 'Keyword Analysis') {
+          if (r.existingKeywords && r.existingKeywords.length) {
+            html += '<div class="section-title">Keywords Found in Your Text</div>';
+            r.existingKeywords.forEach(function(k) {
+              html += '<div class="keyword-item"><div class="keyword-name">"' + escPdf(k.keyword) + '"</div><div>Appears ' + k.frequency + ' times · Density: ' + escPdf(k.density||'') + '% · ' + escPdf(k.assessment||'') + '</div></div>';
+            });
+          }
+          if (r.suggestedKeywords && r.suggestedKeywords.length) {
+            html += '<div class="section-title">Keywords You Should Target</div>';
+            r.suggestedKeywords.forEach(function(k) {
+              html += '<div class="keyword-item"><div class="keyword-name">' + escPdf(k.keyword) + '</div><div>Volume: ' + escPdf(k.searchVolume||'') + ' | Difficulty: ' + escPdf(k.difficulty||'') + ' | CPC: ' + escPdf(k.cpc||'') + '</div><div style="color:#666;">How to use: ' + escPdf(k.howToUse||'') + '</div></div>';
+            });
+          }
+          if (r.longTailKeywords && r.longTailKeywords.length) {
+            html += '<div class="section-title">Long-Tail Keyword Opportunities</div>';
+            r.longTailKeywords.forEach(function(k) {
+              var kText = (typeof k === 'object') ? (k.phrase||k.keyword||'') : k;
+              html += '<div class="rec-item">' + escPdf(kText) + '</div>';
+            });
+          }
+          if (r.questionKeywords && r.questionKeywords.length) {
+            html += '<div class="section-title">Question Keywords</div>';
+            r.questionKeywords.forEach(function(k) { html += '<div class="rec-item">' + escPdf(k) + '</div>'; });
+          }
+        }
+
+        // AI Detection
+        if (r.flaggedSentences && r.flaggedSentences.length && r.name === 'AI Content Detection') {
+          html += '<div class="section-title">⚠ AI-Written Sentences Detected</div>';
+          r.flaggedSentences.forEach(function(s) { html += '<div class="flagged-item">"' + escPdf(s) + '"</div>'; });
+          if (r.detectionReasons && r.detectionReasons.length) {
+            html += '<div class="section-title">Why This Was Detected</div>';
+            r.detectionReasons.forEach(function(reason) { html += '<div class="rec-item">' + escPdf(reason) + '</div>'; });
+          }
+        }
+
+        // Plagiarism
+        if (r.flaggedSections && r.flaggedSections.length && r.name === 'Plagiarism Checker') {
+          html += '<div class="section-title">⚠ Flagged Sections</div>';
+          r.flaggedSections.forEach(function(s) {
+            html += '<div class="flagged-item"><div style="color:#e05c5c;margin-bottom:5px;">"' + escPdf(s.text||'') + '"</div><div style="color:#666;">Reason: ' + escPdf(s.reason||'') + '</div><div style="color:#666;">Source: ' + escPdf(s.source||'') + ' | Severity: ' + escPdf(s.severity||'') + '</div><div style="color:#2e7d32;">Suggestion: ' + escPdf(s.suggestion||'') + '</div></div>';
+          });
+        }
+
+        // Summarization
         if (r.name === 'Text Summarization') {
-          if (r.executiveSummary) {
-            html += '<div class="section-title">Executive Summary</div><div class="content-box">' + escPdf(r.executiveSummary) + '</div>';
-          }
-          if (r.shortSummary) {
-            html += '<div class="section-title">Quick Summary</div><div class="content-box green-border">' + escPdf(r.shortSummary) + '</div>';
-          }
-          if (r.bulletSummary && r.bulletSummary.length > 0) {
+          if (r.executiveSummary) html += '<div class="section-title">Executive Summary</div><div class="content-box">' + escPdf(r.executiveSummary) + '</div>';
+          if (r.shortSummary) html += '<div class="section-title">One-Line Summary</div><div class="content-box green-border">' + escPdf(r.shortSummary) + '</div>';
+          if (r.bulletSummary && r.bulletSummary.length) {
             html += '<div class="section-title">Key Points</div>';
             r.bulletSummary.forEach(function(p) { html += '<div class="rec-item">' + escPdf(p) + '</div>'; });
           }
-          if (r.studyNotes && r.studyNotes.length > 0) {
+          if (r.studyNotes && r.studyNotes.length) {
             html += '<div class="section-title">Study Notes</div>';
             r.studyNotes.forEach(function(n) { html += '<div class="rec-item">' + escPdf(n) + '</div>'; });
           }
         }
 
-        // Formatting in PDF
-        if (r.name === 'Formatting Assistance' && r.formattedVersion) {
-          html += '<div class="section-title">Formatted Version</div><div class="content-box">' + escPdf(r.formattedVersion) + '</div>';
-          if (r.tableOfContents && r.tableOfContents.length > 0) {
+        // Formatting
+        if (r.name === 'Formatting Assistance') {
+          if (r.formattedVersion) html += '<div class="section-title">Formatted Version</div><div class="content-box">' + escPdf(r.formattedVersion) + '</div>';
+          if (r.tableOfContents && r.tableOfContents.length) {
             html += '<div class="section-title">Table of Contents</div>';
             r.tableOfContents.forEach(function(s, i) { html += '<div class="rec-item">' + (i+1) + '. ' + escPdf(s) + '</div>'; });
           }
-          if (r.formattingIssues && r.formattingIssues.length > 0) {
+          if (r.formattingIssues && r.formattingIssues.length) {
             html += '<div class="section-title">Formatting Issues Found</div>';
             r.formattingIssues.forEach(function(issue) {
               html += '<div class="flagged-item"><div style="font-weight:bold;">' + escPdf(issue.issue||'') + '</div><div>Severity: ' + escPdf(issue.severity||'') + '</div><div style="color:#2e7d32;">Fix: ' + escPdf(issue.fix||issue.suggestion||'') + '</div></div>';
@@ -742,150 +697,27 @@
           }
         }
 
-        // Keyword analysis tables
-        if (r.name === 'Keyword Analysis') {
-          if (r.existingKeywords && r.existingKeywords.length > 0) {
-            html += `<div class="section-title">Keywords Found in Your Text</div>`;
-            r.existingKeywords.forEach(function(k) {
-              html += `<div class="keyword-item">
-  <div class="keyword-name">"${escPdf(k.keyword)}"</div>
-  <div>Appears ${k.frequency} times · Density: ${escPdf(k.density||'')} · ${escPdf(k.assessment||'')}</div>
-</div>`;
-            });
-          }
-          if (r.suggestedKeywords && r.suggestedKeywords.length > 0) {
-            html += `<div class="section-title">Keywords You Should Target</div>`;
-            r.suggestedKeywords.forEach(function(k) {
-              html += `<div class="keyword-item">
-  <div class="keyword-name">${escPdf(k.keyword)}</div>
-  <div>Volume: ${escPdf(k.searchVolume||'')} | Difficulty: ${escPdf(k.difficulty||'')} | Intent: ${escPdf(k.intent||'')}</div>
-  <div style="color:#666;">How to use: ${escPdf(k.howToUse||'')}</div>
-</div>`;
-            });
-          }
-          if (r.longTailKeywords && r.longTailKeywords.length > 0) {
-            html += `<div class="section-title">Long-Tail Keyword Opportunities</div>`;
-            r.longTailKeywords.forEach(function(k) {
-              html += `<div class="rec-item">${escPdf(k)}</div>`;
-            });
-          }
-        }
-
-        // FORMATTING — show formatted version
-        if (r.name === 'Formatting Assistance' && r.formattedVersion) {
-          extraHTML += '<div class="recs-title" style="margin-top:20px;color:#c9a84c;">📐 Formatted Version</div>' +
-            '<div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.2);padding:16px;margin-bottom:12px;font-size:13px;line-height:1.8;color:#f5f2eb;white-space:pre-wrap;">' + escHtml(r.formattedVersion) + '</div>';
-          if (r.tableOfContents && r.tableOfContents.length > 0) {
-            extraHTML += '<div class="recs-title">Suggested Table of Contents</div>';
-            r.tableOfContents.forEach(function(s, i) {
-              extraHTML += '<div class="rec-item">' + (i+1) + '. ' + escHtml(s) + '</div>';
-            });
-          }
-          if (r.formattingIssues && r.formattingIssues.length > 0) {
-            extraHTML += '<div class="recs-title" style="margin-top:12px;color:#e05c5c;">⚠ Formatting Issues Found</div>';
-            r.formattingIssues.forEach(function(issue) {
-              extraHTML += '<div class="rec-item" style="flex-direction:column;gap:3px;">' +
-                '<span style="color:#f5f2eb;font-weight:500;">' + escHtml(issue.issue||'') + '</span>' +
-                '<span style="color:#6b6860;font-size:12px;">Severity: ' + escHtml(issue.severity||'') + ' — Fix: ' + escHtml(issue.fix||issue.suggestion||'') + '</span>' +
-              '</div>';
-            });
-          }
-        }
-
-        // AI Detection flagged sentences
-        if (r.flaggedSentences && r.flaggedSentences.length > 0 && r.name === 'AI Content Detection') {
-          html += `<div class="section-title">⚠ AI-Written Sentences Detected</div>`;
-          r.flaggedSentences.forEach(function(s) {
-            html += `<div class="flagged-item">"${escPdf(s)}"</div>`;
-          });
-          if (r.detectionReasons && r.detectionReasons.length > 0) {
-            html += `<div class="section-title">Why This Was Detected</div>`;
-            r.detectionReasons.forEach(function(reason) {
-              html += `<div class="rec-item">${escPdf(reason)}</div>`;
-            });
-          }
-        }
-
-        // Plagiarism flagged sections
-        if (r.flaggedSections && r.flaggedSections.length > 0 && r.name === 'Plagiarism Checker') {
-          html += `<div class="section-title">⚠ Flagged Sections</div>`;
-          r.flaggedSections.forEach(function(s) {
-            html += `<div class="flagged-item">
-  <div style="color:#e05c5c;margin-bottom:5px;">"${escPdf(s.text||'')}"</div>
-  <div style="color:#666;">Reason: ${escPdf(s.reason||'')}</div>
-  <div style="color:#2e9e4f;">Suggestion: ${escPdf(s.suggestion||'')}</div>
-</div>`;
-          });
-        }
-
         // Recommendations
-        if (r.recommendations && r.recommendations.length > 0) {
-          html += `<div class="section-title">Recommendations</div>`;
-          r.recommendations.forEach(function(rec) {
-            html += `<div class="rec-item">${escPdf(rec)}</div>`;
-          });
+        if (r.recommendations && r.recommendations.length) {
+          html += '<div class="section-title">Recommendations</div>';
+          r.recommendations.forEach(function(rec) { html += '<div class="rec-item">' + escPdf(rec) + '</div>'; });
         }
 
-        html += `</div></div>`;
+        html += '</div></div>';
       });
 
-      html += `<div class="footer">
-  <span>ContentIQ — Content Intelligence Platform</span>
-  <span>Generated on ${dateStr}</span>
-</div>
+      html += '<div class="footer"><span>ContentIQ — Content Intelligence Platform</span><span>Generated on ' + dateStr + '</span></div>';
+      html += '</body></html>';
 
-  <script>
-    // Hamburger menu
-    var hBtn = document.getElementById('hamburgerBtn');
-    var mNav = document.getElementById('mobileNav');
-    if (hBtn && mNav) {
-      hBtn.addEventListener('click', function() {
-        hBtn.classList.toggle('open');
-        mNav.classList.toggle('open');
-        document.body.style.overflow = mNav.classList.contains('open') ? 'hidden' : '';
-      });
-      // Close menu when a link is clicked
-      mNav.querySelectorAll('a').forEach(function(link) {
-        link.addEventListener('click', function() {
-          hBtn.classList.remove('open');
-          mNav.classList.remove('open');
-          document.body.style.overflow = '';
-        });
-      });
-    }
-    var mLogout = document.getElementById('mobileLogoutBtn');
-    if (mLogout) {
-      mLogout.addEventListener('click', function() {
-        localStorage.removeItem('contentIQToken');
-        localStorage.removeItem('contentIQUser');
-        localStorage.removeItem('contentIQUploadData');
-        localStorage.removeItem('contentIQSelectedServices');
-        localStorage.removeItem('contentIQResults');
-        window.location.href = '/';
-      });
-    }
-  </script>
-</body></html>`;
-
-      // Open in new window and trigger print/save as PDF
       var win = window.open('', '_blank');
       win.document.write(html);
       win.document.close();
-
-      // Wait for content to load then print
-      win.onload = function() {
-        win.focus();
-        win.print();
-      };
+      win.onload = function() { win.focus(); win.print(); };
     }
 
     function escPdf(str) {
       if (!str) return '';
-      return String(str)
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;');
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
   </script>
 </body>
