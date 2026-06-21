@@ -1,32 +1,32 @@
-// PLAGIARISM CHECKER SERVICE — Professional Grade
+// PLAGIARISM CHECKER SERVICE — Fixed missing reason field
 const { callGroq } = require("./groqHelper");
 
 async function analyzeSimilarity(text) {
-  const prompt = `You are a professional plagiarism detection expert like Turnitin and Grammarly. Analyze the content for plagiarism, copied sentences, and originality issues.
+  const shortText = text.trim().substring(0, 1500);
+
+  const prompt = `You are a professional plagiarism detection expert like Turnitin. Analyze this content for plagiarism and originality.
 
 CONTENT:
 """
-${text.substring(0, 2500)}
+${shortText}
 """
 
-Check for: copied phrases, common templates, Wikipedia-style sentences, academic clichés, duplicate internal phrases, and unoriginal expressions. Be very specific about what looks copied and why.
-
-Respond ONLY with valid JSON:
+Return ONLY valid JSON, no extra text:
 {
-  "score": <originality score 0-100, where 100 = fully original>,
-  "badge": "<Highly Original | Mostly Original | Partially Original | High Plagiarism Risk>",
-  "similarityPercentage": <estimated similarity percentage 0-100>,
+  "score": <originality score 0-100>,
+  "badge": "<Highly Original|Mostly Original|Partially Original|High Plagiarism Risk>",
+  "similarityPercentage": <number 0-100>,
   "originalityPercentage": <100 minus similarity>,
-  "plagiarismRisk": "<Low | Medium | High | Critical>",
+  "plagiarismRisk": "<Low|Medium|High|Critical>",
   "flaggedSections": [
-    { "text": "<exact copied/suspicious sentence from content>", "issue": "<why this is flagged>", "source": "<likely source type e.g. Wikipedia, common template, academic cliché>", "severity": "<High | Medium | Low>", "suggestion": "<how to rewrite this>" },
-    { "text": "<sentence>", "issue": "<issue>", "source": "<source>", "severity": "<severity>", "suggestion": "<fix>" },
-    { "text": "<sentence>", "issue": "<issue>", "source": "<source>", "severity": "<severity>", "suggestion": "<fix>" }
+    { "text": "<exact sentence>", "reason": "<why this is flagged — be specific>", "source": "<Wikipedia|Common template|Academic cliche|Web content>", "severity": "High", "suggestion": "<how to rewrite>" },
+    { "text": "<sentence>", "reason": "<specific reason>", "source": "<source type>", "severity": "Medium", "suggestion": "<fix>" },
+    { "text": "<sentence>", "reason": "<specific reason>", "source": "<source type>", "severity": "Low", "suggestion": "<fix>" }
   ],
-  "duplicatePhrases": ["<repeated phrase 1 found internally>", "<phrase 2>"],
-  "commonTemplates": ["<template phrase 1 found>", "<template 2>"],
-  "citationNeeded": ["<statement that needs a citation>", "<statement 2>"],
-  "originalSections": ["<genuinely original part 1>", "<part 2>"],
+  "duplicatePhrases": ["<repeated phrase1>", "<phrase2>"],
+  "commonTemplates": ["<template phrase1>", "<template2>"],
+  "citationNeeded": ["<statement needing citation>"],
+  "originalSections": ["<genuinely original part>", "<part2>"],
   "insights": [
     { "label": "Originality Score", "value": "<score>%" },
     { "label": "Similarity Score", "value": "<percentage>%" },
@@ -38,7 +38,7 @@ Respond ONLY with valid JSON:
     { "label": "Important Note", "value": "Structural analysis only — not web-indexed like Turnitin" }
   ],
   "recommendations": [
-    "<specific rewriting instruction for flagged section>",
+    "<specific rewriting instruction>",
     "<recommendation 2>",
     "<recommendation 3>",
     "<recommendation 4>",
@@ -49,10 +49,22 @@ Respond ONLY with valid JSON:
   try {
     const raw = await callGroq(prompt);
     const result = JSON.parse(raw);
-    return { score: result.score || 70, badge: result.badge || "Mostly Original", color: result.score >= 70 ? "green" : "warn", icon: "📄", name: "Plagiarism Checker", ...result };
+    return {
+      score: result.score || 70,
+      badge: result.badge || "Mostly Original",
+      color: result.score >= 70 ? "green" : "warn",
+      icon: "📄",
+      name: "Plagiarism Checker",
+      ...result,
+    };
   } catch (err) {
     console.error("Plagiarism Error:", err.message);
-    return { score: 0, badge: "Error", color: "warn", icon: "📄", name: "Plagiarism Checker", insights: [{ label: "Error", value: err.message }], recommendations: ["Please check your GROQ_API_KEY and try again."] };
+    return {
+      score: 0, badge: "Error", color: "warn", icon: "📄",
+      name: "Plagiarism Checker",
+      insights: [{ label: "Error", value: err.message }],
+      recommendations: ["Please check your GROQ_API_KEY and try again."],
+    };
   }
 }
 

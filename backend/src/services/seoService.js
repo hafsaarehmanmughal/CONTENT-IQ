@@ -1,38 +1,39 @@
-// SEO OPTIMIZATION SERVICE — Professional Grade
+// SEO OPTIMIZATION SERVICE — Fixed search volume display
 const { callGroq } = require("./groqHelper");
 
 async function analyzeSEO(text) {
-  const prompt = `You are a world-class SEO expert like SEMrush or Ahrefs. Analyze the following content and provide a comprehensive professional SEO analysis.
+  const shortText = text.trim().substring(0, 1500);
+
+  const prompt = `You are a world-class SEO expert like Semrush. Analyze this content and provide professional SEO analysis.
 
 CONTENT:
 """
-${text.substring(0, 2500)}
+${shortText}
 """
 
-Respond ONLY with valid JSON. No text before or after:
+Return ONLY valid JSON, no extra text:
 {
   "score": <number 0-100>,
-  "badge": "<Excellent | Good | Needs Work | Poor>",
-  "topic": "<main topic detected>",
-  "searchIntent": "<Informational | Commercial | Transactional | Navigational>",
+  "badge": "<Excellent|Good|Needs Work|Poor>",
+  "topic": "<main topic>",
+  "searchIntent": "<Informational|Commercial|Transactional|Navigational>",
   "wordCount": <number>,
   "recommendedWordCount": "<e.g. 1500-2000 words>",
-  "keywordDensity": "<current primary keyword density>",
-  "missingKeywords": ["<keyword 1>", "<keyword 2>", "<keyword 3>", "<keyword 4>", "<keyword 5>"],
-  "suggestedKeywords": [
-    { "keyword": "<keyword>", "searchVolume": "<High | Medium | Low>", "difficulty": "<Easy | Medium | Hard>", "intent": "<search intent>", "priority": "<Must Add | Should Add | Optional>" },
-    { "keyword": "<keyword>", "searchVolume": "<High | Medium | Low>", "difficulty": "<Easy | Medium | Hard>", "intent": "<intent>", "priority": "<priority>" },
-    { "keyword": "<keyword>", "searchVolume": "<High | Medium | Low>", "difficulty": "<Easy | Medium | Hard>", "intent": "<intent>", "priority": "<priority>" },
-    { "keyword": "<keyword>", "searchVolume": "<High | Medium | Low>", "difficulty": "<Easy | Medium | Hard>", "intent": "<intent>", "priority": "<priority>" },
-    { "keyword": "<keyword>", "searchVolume": "<High | Medium | Low>", "difficulty": "<Easy | Medium | Hard>", "intent": "<intent>", "priority": "<priority>" }
-  ],
-  "longTailKeywords": ["<phrase 1>", "<phrase 2>", "<phrase 3>", "<phrase 4>"],
+  "keywordDensity": "<e.g. 1.2% for primary keyword>",
   "metaTitle": "<suggested SEO title under 60 characters>",
   "metaDescription": "<suggested meta description under 160 characters>",
-  "headingStructure": "<assessment of heading usage>",
-  "contentGaps": ["<topic gap 1>", "<gap 2>", "<gap 3>"],
-  "onPageIssues": ["<issue 1>", "<issue 2>", "<issue 3>"],
-  "seoOptimizedVersion": "<complete rewritten content with SEO keywords naturally integrated and proper structure>",
+  "missingKeywords": ["<keyword1>", "<keyword2>", "<keyword3>", "<keyword4>", "<keyword5>"],
+  "contentGaps": ["<gap1>", "<gap2>", "<gap3>"],
+  "onPageIssues": ["<issue1>", "<issue2>", "<issue3>"],
+  "suggestedKeywords": [
+    { "keyword": "<keyword>", "searchVolume": "High", "difficulty": "Medium", "intent": "<why people search>", "priority": "Must Add" },
+    { "keyword": "<keyword>", "searchVolume": "Medium", "difficulty": "Easy", "intent": "<intent>", "priority": "Should Add" },
+    { "keyword": "<keyword>", "searchVolume": "Low", "difficulty": "Easy", "intent": "<intent>", "priority": "Optional" },
+    { "keyword": "<keyword>", "searchVolume": "High", "difficulty": "Hard", "intent": "<intent>", "priority": "Must Add" },
+    { "keyword": "<keyword>", "searchVolume": "Medium", "difficulty": "Medium", "intent": "<intent>", "priority": "Should Add" }
+  ],
+  "longTailKeywords": ["<phrase1>", "<phrase2>", "<phrase3>", "<phrase4>"],
+  "seoOptimizedVersion": "<complete rewritten content with keywords integrated naturally>",
   "insights": [
     { "label": "SEO Score", "value": "<score>/100" },
     { "label": "Main Topic", "value": "<topic>" },
@@ -41,7 +42,7 @@ Respond ONLY with valid JSON. No text before or after:
     { "label": "Keyword Density", "value": "<density>" },
     { "label": "Content Gaps", "value": "<number> gaps detected" },
     { "label": "Missing Keywords", "value": "<number> important keywords missing" },
-    { "label": "Meta Title", "value": "<suggested title>" }
+    { "label": "Meta Title", "value": "<title>" }
   ],
   "recommendations": [
     "<specific SEO action 1>",
@@ -55,10 +56,22 @@ Respond ONLY with valid JSON. No text before or after:
   try {
     const raw = await callGroq(prompt);
     const result = JSON.parse(raw);
-    return { score: result.score || 50, badge: result.badge || "Needs Work", color: result.score >= 70 ? "gold" : "warn", icon: "📊", name: "SEO Optimization", ...result };
+    return {
+      score: result.score || 50,
+      badge: result.badge || "Needs Work",
+      color: result.score >= 70 ? "gold" : "warn",
+      icon: "📊",
+      name: "SEO Optimization",
+      ...result,
+    };
   } catch (err) {
     console.error("SEO Error:", err.message);
-    return { score: 0, badge: "Error", color: "warn", icon: "📊", name: "SEO Optimization", insights: [{ label: "Error", value: err.message }], recommendations: ["Please check your GROQ_API_KEY and try again."] };
+    return {
+      score: 0, badge: "Error", color: "warn", icon: "📊",
+      name: "SEO Optimization",
+      insights: [{ label: "Error", value: err.message }],
+      recommendations: ["Please check your GROQ_API_KEY and try again."],
+    };
   }
 }
 
