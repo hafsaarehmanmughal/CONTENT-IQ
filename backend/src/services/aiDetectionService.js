@@ -14,7 +14,7 @@ Analyze carefully for: uniform sentence structure, robotic transitions (Furtherm
 Respond ONLY with valid JSON:
 {
   "aiProbability": <number 0-100, where 100 = definitely AI>,
-  "score": <100 minus aiProbability>,
+  "score": <same as aiProbability — the AI probability percentage>,
   "badge": "<Definitely Human | Likely Human | Mixed Content | Likely AI | Definitely AI>",
   "verdict": "<one clear sentence verdict>",
   "mixedContent": <true if both human and AI sections detected>,
@@ -61,7 +61,7 @@ Respond ONLY with valid JSON:
     const raw = await callGroq(prompt);
     const result = JSON.parse(raw);
     const aiProb = result.aiProbability || 50;
-    return { score: 100 - aiProb, badge: result.badge || "Mixed Content", color: (100 - aiProb) >= 60 ? "green" : "warn", icon: "🤖", name: "AI Content Detection", aiProbability: aiProb, ...result };
+    return { score: aiProb, badge: result.badge || "Mixed Content", color: aiProb >= 60 ? "warn" : "green", icon: "🤖", name: "AI Content Detection", aiProbability: aiProb, humanScore: 100 - aiProb, ...result };
   } catch (err) {
     console.error("AI Detection Error:", err.message);
     return { score: 0, badge: "Error", color: "warn", icon: "🤖", name: "AI Content Detection", insights: [{ label: "Error", value: err.message }], recommendations: ["Please check your GROQ_API_KEY and try again."] };

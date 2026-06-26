@@ -303,9 +303,18 @@
       reports.forEach(function(r) {
         var lower = (r.badge||'').toLowerCase();
         var bc = (lower.includes('excellent')||lower.includes('original')||lower.includes('human')||lower.includes('low')||lower.includes('optimized')||lower.includes('good')) ? 'good' : 'warn';
+        // For AI Detection: show AI% with red, show Human% below
+        var displayScore = r.score + '%';
+        var subLabel = '';
+        if (r.name === 'AI Content Detection') {
+          displayScore = r.score + '% AI';
+          subLabel = '<div style="font-size:10px;color:#7ec87e;margin-top:2px;">' + (r.humanScore||100-r.score) + '% Human</div>';
+          bc = r.score >= 60 ? 'warn' : 'good';
+        }
         scoreRow.innerHTML +=
           '<div class="score-chip">' +
-            '<div class="score-value '+r.color+'">' + r.score + '%</div>' +
+            '<div class="score-value '+r.color+'" style="font-size:24px;">' + displayScore + '</div>' +
+            subLabel +
             '<div class="score-name">' + r.name + '</div>' +
             '<span class="score-badge '+bc+'">' + r.badge + '</span>' +
           '</div>';
@@ -575,7 +584,9 @@
       // Score chips
       html += '<div class="scores-row">';
       reports.forEach(function(r) {
-        html += '<div class="score-chip"><div class="score-num ' + r.color + '">' + r.score + '%</div><div class="score-name">' + r.name + '</div><div class="score-badge">' + r.badge + '</div></div>';
+        var displayScore = r.score + '%';
+        if (r.name === 'AI Content Detection') displayScore = r.score + '% AI';
+        html += '<div class="score-chip"><div class="score-num ' + r.color + '">' + displayScore + '</div><div class="score-name">' + r.name + '</div><div class="score-badge">' + r.badge + '</div></div>';
       });
       html += '</div>';
 
